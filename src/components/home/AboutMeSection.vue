@@ -3,7 +3,7 @@ import SectionTitle from '@/components/ui/SectionTitle.vue';
 </script>
 <template>
     <section class="py-16">
-        <SectionTitle title="Spationaute du Web" astronaut-image="/src/assets/illustrations/astronaut-moon.svg" />
+        <SectionTitle title="Spationaute du Web" astronaut-image="@/assests/illustrations/astronaut-moon.svg" />
         <h4 class="text-secondary text-center my-4 italic">En exploration constante des frontières du développement web.
         </h4>
         <div class="container mx-auto px-2 md:px-4">

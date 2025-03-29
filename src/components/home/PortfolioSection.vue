@@ -7,7 +7,7 @@ const portfolio = ref<Project[]>([
     {
         title: 'Umaï',
         description: "La vitrine numérique d'un restaurant franco-asiatique",
-        image: '/src/assets/illustrations/slide2-umai.webp',
+        image: '@/assests/illustrations/slide2-umai.webp',
         tags: [
             {
                 title: "Code",
@@ -26,7 +26,7 @@ const portfolio = ref<Project[]>([
     {
         title: 'Cleanovia',
         description: "La carte de visite en ligne d'une entreprise de services personnalisés",
-        image: '/src/assets/illustrations/slide-cleanovia.webp',
+        image: '@/assests/illustrations/slide-cleanovia.webp',
         tags: [
             {
                 title: "Low-Code",
@@ -45,7 +45,7 @@ const portfolio = ref<Project[]>([
     {
         title: 'Lister',
         description: "Une plateforme web d'organisation de tâches et des projets",
-        image: '/src/assets/illustrations/myapptodo.webp',
+        image: '@/assests/illustrations/myapptodo.webp',
         tags: [
             {
                 title: "No-Code",
@@ -65,7 +65,7 @@ const portfolio = ref<Project[]>([
 <template>
     <section class="py-16 bg-primary">
         <div class="container mx-auto px-2 lg:px-4">
-            <SectionTitle title="Mes Réalisations" astronautImage="/src/assets/illustrations/astronaut-paint.svg" />
+            <SectionTitle title="Mes Réalisations" astronautImage="@/assests/illustrations/astronaut-paint.svg" />
             <h4 class="text-secondary text-center my-4 italic">Des réalisations concrètes qui parlent mieux que des
                 mots.
             </h4>

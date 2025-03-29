@@ -13,7 +13,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-accent',
         title: 'Formation Chef de Projet Web et Cybersécurité',
         description: 'Maîtrise des compétences en gestion de projet web et protection des systèmes d\'information chez Cloud Campus',
-        logo: '/src/assets/logos/LogoBleuOmbre-edited.webp',
+        logo: '@/assests/logos/LogoBleuOmbre-edited.webp',
         alt: 'Logo Cloud Campus'
     },
     {
@@ -24,7 +24,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-emphasis',
         title: 'Création de Sites Web en Freelance',
         description: 'Conception de solutions web sur mesure pour répondre à vos besoins numériques',
-        logo: '/src/assets/logos/LogoSamySBHAvecFondGrand.webp',
+        logo: '@/assests/logos/LogoSamySBHAvecFondGrand.webp',
         alt: 'Logo Samy'
     },
     {
@@ -35,7 +35,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-emphasis',
         title: 'Poste de Développeur Web en Alternance',
         description: 'Développement No-Code sur la technologie Bubble.io chez Shifter - Logiciel de gestion pour boutiques et ateliers vélo',
-        logo: '/src/assets/logos/ShifterLogo.svg',
+        logo: '@/assests/logos/ShifterLogo.svg',
         alt: 'Logo Shifter'
     },
     {
@@ -46,7 +46,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-accent',
         title: 'Formation Développeur Web FullStack',
         description: 'Acquisition des compétences en développement web moderne chez Cloud Campus',
-        logo: '/src/assets/logos/LogoBleuOmbre-edited.webp',
+        logo: '@/assests/logos/LogoBleuOmbre-edited.webp',
         alt: 'Logo Cloud Campus'
     }
 ]);
@@ -54,7 +54,7 @@ const myPath = ref<PathStep[]>([
 <template>
     <section class="py-12 px-2 md:px-4 bg-primary">
         <div class="container mx-auto">
-            <SectionTitle title="Mon Parcours" astronaut-image="/src/assets/illustrations/astronaut-fly.svg" />
+            <SectionTitle title="Mon Parcours" astronaut-image="@/assests/illustrations/astronaut-fly.svg" />
             <h4 class="text-secondary text-center my-4 italic">Les expériences qui ont façonné mes compétences
                 actuelles.
             </h4>
