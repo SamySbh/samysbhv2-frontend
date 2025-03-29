@@ -7,12 +7,6 @@ export const useUploadStore = defineStore('upload', () => {
     const uploadProgress = ref<number>(0);
     const apiUrl = import.meta.env.VITE_API_URL;
 
-    /**
-     * Upload un fichier vers le serveur
-     * @param file Le fichier à uploader
-     * @param endpoint L'endpoint d'API (par défaut '/upload/image')
-     * @returns Promise avec l'URL du fichier uploadé
-     */
     async function uploadFile(file: File, endpoint: string = '/upload/image'): Promise<string> {
         isUploading.value = true;
         error.value = null;
