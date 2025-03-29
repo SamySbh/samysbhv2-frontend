@@ -84,10 +84,6 @@ export const usePaymentStore = defineStore('payment', () => {
             // Mettre à jour le statut local
             paymentStatus.value = 'success'
             
-            // Dans une implémentation complète, vous pourriez vouloir
-            // mettre à jour l'ordre ou récupérer des informations supplémentaires
-            // Mais cela dépend de votre logique métier spécifique
-            
             return { success: true, sessionId }
         } catch (err) {
             console.error("Erreur lors du traitement du succès du paiement:", err)
@@ -108,10 +104,6 @@ export const usePaymentStore = defineStore('payment', () => {
         try {
             // Mettre à jour le statut local
             paymentStatus.value = 'canceled'
-            
-            // Dans une implémentation complète, vous pourriez vouloir
-            // mettre à jour l'ordre ou effectuer d'autres actions
-            // Mais cela dépend de votre logique métier spécifique
             
             return { success: true, status: 'canceled' }
         } catch (err) {
