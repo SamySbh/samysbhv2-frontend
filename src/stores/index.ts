@@ -1,4 +1,3 @@
-// Réexportation de tous les stores pour faciliter l'importation
 export * from './auth.store'
 export * from './order.store'
 export * from './order-items.store'
