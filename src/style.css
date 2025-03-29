@@ -1,0 +1,71 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+
+@layer base {
+  body {
+    @apply bg-primary min-h-screen flex flex-col bg-site-pattern bg-fixed bg-cover;
+    font-family: 'Geologica', serif;
+  }
+  .title {
+    @apply font-black md:text-4xl text-xl text-secondary border-accent border-0 rounded-full w-fit uppercase px-2 pb-1 ;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 text-secondary rounded border-solid border-2 border-secondary text-sm lg:text-base uppercase;
+    background: radial-gradient(circle,#7893F3 0%, #476EF6 100% );
+  }
+  .card {
+    @apply bg-secondary-ghost rounded shadow-md p-4;
+  }
+}
+.astronaut-float {
+  position: relative;
+  animation: float 16s infinite ease-in-out;
+}
+
+@keyframes float {
+  /* Aller */
+  0% {
+    transform: translate(0, 1px) rotate(-5deg) scaleX(1);
+  }
+  12.5% {
+    transform: translate(-50px, -25px) rotate(5deg) scaleX(1);
+  }
+  25% {
+    transform: translate(-100px, 1px) rotate(-5deg) scaleX(1);
+  }
+  37.5% {
+    transform: translate(-150px, -25px) rotate(5deg) scaleX(1);
+  }
+  50% {
+    transform: translate(-200px, 1px) rotate(-5deg) scaleX(1);
+  }
+  
+  /* Moment du retournement */
+  50.1% {
+    transform: translate(-200px, 1px) rotate(-5deg) scaleX(-1);
+  }
+  
+  /* Retour */
+  62.5% {
+    transform: translate(-150px, -25px) rotate(-5deg) scaleX(-1);
+  }
+  75% {
+    transform: translate(-100px, 1px) rotate(5deg) scaleX(-1);
+  }
+  87.5% {
+    transform: translate(-50px, -25px) rotate(-5deg) scaleX(-1);
+  }
+  99.9% {
+    transform: translate(0, 1px) rotate(5deg) scaleX(-1);
+  }
+  
+  /* Retournement final pour recommencer l'animation */
+  100% {
+    transform: translate(0, 1px) rotate(-5deg) scaleX(1);
+  }
+}
