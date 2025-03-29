@@ -98,7 +98,7 @@ onBeforeUnmount(() => {
 
         <div class="absolute left-1/2 transform -translate-x-1/2 h-full flex items-center">
           <RouterLink to="/" class="block">
-            <img src="/assets/logos/LogoSamySBHAvecFondGrand.webp" alt="Logo" class="h-12 w-auto">
+            <img src="@/assets/logos/LogoSamySBHAvecFondGrand.webp" alt="Logo" class="h-12 w-auto">
           </RouterLink>
         </div>
 
@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
 
         <div class="absolute left-1/2 top-8 -translate-x-1/2 -translate-y-1/2">
           <RouterLink to="/" class="size-8 block">
-            <img src="/assets/logos/LogoSamySBHAvecFondGrand.webp" alt="Logo" class="w-full h-auto">
+            <img src="@/assets/logos/LogoSamySBHAvecFondGrand.webp" alt="Logo" class="w-full h-auto">
           </RouterLink>
         </div>
 

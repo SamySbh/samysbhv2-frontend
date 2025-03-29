@@ -18,10 +18,10 @@
                         </div>
                     </div>
                     <img class="size-16 md:size-24 mt-4 justify-self-end astronaut-float"
-                        src="/assets/illustrations/astronaut-float.svg" alt="Astronaute Flottant">
+                        src="@/assets/illustrations/astronaut-float.svg" alt="Astronaute Flottant">
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 md:gap-4 mx-auto text-center card space-y-4">
-                    <img class="max-w-xs md:max-w-sm m-auto" src="/assets/illustrations/laptop-rocket-money.webp"
+                    <img class="max-w-xs md:max-w-sm m-auto" src="@/assets/illustrations/laptop-rocket-money.webp"
                         alt="Laptop Rocket Money">
                     <div class="flex flex-col justify-center gap-8">
                         <h1 class="text-xl md:text-3xl font-bold">

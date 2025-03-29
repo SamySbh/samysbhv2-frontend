@@ -2,10 +2,10 @@ export default {
     title: "SamySBH | Documentation",
     description: "Documentation complète de l'API et du frontend",
     head: [
-        ['link', { rel: 'icon', type: 'image/svg+xml', href: '/assets/logos/LogoSamySbhAvecFond.svg' }]
+        ['link', { rel: 'icon', type: 'image/svg+xml', href: '@/assets/logos/LogoSamySbhAvecFond.svg' }]
     ],
     themeConfig: {
-        logo: "/assets/logos/LogoSamySbhAvecFond.svg",
+        logo: "@/assets/logos/LogoSamySbhAvecFond.svg",
         nav: [
             { text: "Accueil", link: "/" },
             { text: "Guide", link: "/guide/" },

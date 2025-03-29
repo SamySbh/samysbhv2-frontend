@@ -21,7 +21,7 @@ export default {
         genos: ['Genos', 'serif']
       },
       backgroundImage: {
-        'site-pattern': "url('/assets/backgrounds/nature-space-background-star-nebula-cosmos-2025-02-21-13-04-50-utc.jpg')",
+        'site-pattern': "url('@/assets/backgrounds/nature-space-background-star-nebula-cosmos-2025-02-21-13-04-50-utc.jpg')",
       },
     },
   },

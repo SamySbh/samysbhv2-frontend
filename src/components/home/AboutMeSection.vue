@@ -3,14 +3,14 @@ import SectionTitle from '@/components/ui/SectionTitle.vue';
 </script>
 <template>
     <section class="py-16">
-        <SectionTitle title="Spationaute du Web" astronaut-image="/src/assets/illustrations/astronaut-moon.svg" />
+        <SectionTitle title="Spationaute du Web" astronaut-image="@/assets/illustrations/astronaut-moon.svg" />
         <h4 class="text-secondary text-center my-4 italic">En exploration constante des frontières du développement web.
         </h4>
         <div class="container mx-auto px-2 md:px-4">
             <div class="mx-auto card">
                 <div class="grid md:grid-cols-[30%_1fr] gap-6 md:gap-12 place-items-center">
                     <div class="flex justify-center w-full">
-                        <img class="xl:max-w-lg w-3/4 " src="/assets/profile-pictures/Samy-Selfie-Round-Blue.webp"
+                        <img class="xl:max-w-lg w-3/4 " src="@/assets/profile-pictures/Samy-Selfie-Round-Blue.webp"
                             alt="Portrait Samy SEBAHI">
                     </div>
                     <div>

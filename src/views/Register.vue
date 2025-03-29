@@ -5,7 +5,7 @@ import RegisterForm from '@/components/forms/RegisterForm.vue'
 
 <template>
     <section class="flex items-center justify-center h-lvh bg-primary px-4 flex-col">
-        <SectionTitle title="Inscription" astronaut-image="src/assets/illustrations/astronaut-friends.svg"/>
+        <SectionTitle title="Inscription" astronaut-image="src@/assets/illustrations/astronaut-friends.svg"/>
         <RegisterForm />
     </section>
 </template>

@@ -10,7 +10,7 @@ const { needsConsent, acceptCookies, rejectCookies } = useCookieConsent()
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div class="flex-grow">
                     <div class="flex items-center">
-                        <img class="w-20" src="/assets/illustrations/cookies-coffee.svg" alt="Cookies">
+                        <img class="w-20" src="@/assets/illustrations/cookies-coffee.svg" alt="Cookies">
                         <h3 class="text-lg font-semibold mb-2 text-secondary">Cookies & Coffeedentialité</h3>
                     </div>
                     <p class="text-sm text-secondary-ghost">

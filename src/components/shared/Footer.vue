@@ -21,9 +21,9 @@ const legalLinks = [
 
 // Liens sociaux (à adapter selon vos réseaux)
 const socialLinks = [
-    //{ url: 'https://instagram.com/', name: 'Instagram', icon: '/src/assets/logos/icons8-instagram-sticker.svg' },
-    { url: 'https://github.com/SamySbh', name: 'GitHub', icon: '/src/assets/logos/icons8-github-sticker.svg' },
-    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: '/src/assets/logos/icons8-linkedin-sticker.svg' }
+    //{ url: 'https://instagram.com/', name: 'Instagram', icon: '@/assets/logos/icons8-instagram-sticker.svg' },
+    { url: 'https://github.com/SamySbh', name: 'GitHub', icon: '@/assets/logos/icons8-github-sticker.svg' },
+    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: '@/assets/logos/icons8-linkedin-sticker.svg' }
 
 ]
 </script>
@@ -36,7 +36,7 @@ const socialLinks = [
                 <!-- Logo et texte d'introduction -->
                 <div class="flex flex-col items-center md:items-start">
                     <RouterLink to="/" class="block mb-4">
-                        <img src="/assets/logos/LogoSamySBHAvecFondGrand.webp" alt="Logo" class="h-16 w-auto">
+                        <img src="@/assets/logos/LogoSamySBHAvecFondGrand.webp" alt="Logo" class="h-16 w-auto">
                     </RouterLink>
                     <p class="text-sm text-center md:text-left">
                         Solutions professionnelles pour vos besoins digitaux.
