@@ -18,7 +18,7 @@ const isSubmitting = ref(false);
 // Computed
 const cartItems = computed(() => cartStore.cartItems);
 const cartTotal = computed(() => cartStore.cartTotal);
-const depositAmount = computed(() => cartTotal.value * 0.3); // 30% d'acompte
+//const depositAmount = computed(() => cartTotal.value * 0.3); // 30% d'acompte
 const isCartEmpty = computed(() => cartItems.value.length === 0);
 
 const user = computed(() => authStore.currentUser || getDefaultUser());

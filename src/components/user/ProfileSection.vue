@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, reactive } from 'vue';
 import { useAuthStore } from '@/stores';
 import { storeToRefs } from 'pinia';
+import { ProfileErrors, PasswordErrors, ValidationErrorsType } from '@/types';
 
 const authStore = useAuthStore();
-const { currentUser, loading, error } = storeToRefs(authStore);
+const { currentUser, loading } = storeToRefs(authStore);
 
 // État pour le mode édition
 const isEditing = ref(false);
@@ -27,7 +28,7 @@ const passwordForm = reactive({
 });
 
 // Erreurs de validation
-const validationErrors = reactive({
+const validationErrors = reactive<ValidationErrorsType>({
   profile: {},
   password: {}
 });
@@ -37,7 +38,7 @@ const initProfileForm = () => {
   if (currentUser.value) {
     profileForm.firstName = currentUser.value.firstName;
     profileForm.lastName = currentUser.value.lastName;
-    profileForm.phone = currentUser.value.phone;
+    profileForm.phone = currentUser.value.phone || '';
     profileForm.company = currentUser.value.company || '';
   }
 };
@@ -58,9 +59,9 @@ const cancelEdit = () => {
   validationErrors.profile = {};
 };
 
-// Valider le formulaire de profil (inchangé)
+// Valider le formulaire de profil
 const validateProfileForm = () => {
-  const errors = {};
+  const errors: ProfileErrors = {};
 
   if (!profileForm.firstName.trim()) {
     errors.firstName = 'Le prénom est requis';
@@ -85,9 +86,9 @@ const validateProfileForm = () => {
   return Object.keys(errors).length === 0;
 };
 
-// Valider le formulaire de mot de passe (inchangé)
+// Valider le formulaire de mot de passe
 const validatePasswordForm = () => {
-  const errors = {};
+  const errors: PasswordErrors = {};
 
   if (!passwordForm.currentPassword) {
     errors.currentPassword = 'Le mot de passe actuel est requis';
@@ -113,7 +114,7 @@ const validatePasswordForm = () => {
   return Object.keys(errors).length === 0;
 };
 
-// Soumettre le formulaire de profil (inchangé)
+// Soumettre le formulaire de profil
 const submitProfileForm = async () => {
   if (!validateProfileForm()) return;
 
@@ -133,7 +134,7 @@ const submitProfileForm = async () => {
     };
 
     isEditing.value = false;
-  } catch (err) {
+  } catch (err: any) {
     submitStatus.value = {
       success: false,
       message: `Erreur lors de la mise à jour : ${err.message}`
@@ -141,7 +142,7 @@ const submitProfileForm = async () => {
   }
 };
 
-// Soumettre le formulaire de mot de passe (inchangé)
+// Soumettre le formulaire de mot de passe
 const submitPasswordForm = async () => {
   if (!validatePasswordForm()) return;
 
@@ -158,7 +159,7 @@ const submitPasswordForm = async () => {
       message: 'Votre mot de passe a été mis à jour avec succès'
     };
 
-  } catch (err) {
+  } catch (err: any) {
     submitStatus.value = {
       success: false,
       message: `Erreur lors de la mise à jour du mot de passe : ${err.message}`
@@ -184,7 +185,7 @@ const fullName = computed(() => {
 const formattedRole = computed(() => {
   if (!currentUser.value) return '';
 
-  const roles = {
+  const roles: Record<string, string> = {
     'ADMIN': 'Administrateur',
     'USER': 'Utilisateur',
     'DISABLED': 'Compte désactivé'

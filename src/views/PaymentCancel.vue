@@ -61,7 +61,7 @@ const retryPayment = async () => {
     try {
         const sessionUrl = await paymentStore.createCheckoutSession(orderDetails.value.id);
         if (sessionUrl) {
-            window.location.href = sessionUrl;
+            window.location.href = String(sessionUrl);
         } else {
             throw new Error("Impossible de créer une session de paiement");
         }
