@@ -31,7 +31,7 @@ const processSteps = ref<ProcessStep[]>([
 <template>
     <section class="py-16">
         <div class="container mx-auto px-2 md:px-4">
-            <SectionTitle title="Mon Processus" astronaut-image="@/assests/illustrations/astronaut-working-laptop.svg"/>
+            <SectionTitle title="Mon Processus" astronaut-image="@/assets/illustrations/astronaut-working-laptop.svg"/>
             <h4 class="text-secondary text-center my-4 italic">Une méthode éprouvée pour concrétiser votre vision
                 numérique.
             </h4>

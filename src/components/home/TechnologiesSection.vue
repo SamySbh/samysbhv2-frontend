@@ -7,19 +7,19 @@ const technologies = ref<Technology[]>([
     {
         title: 'No-Code : Bubble.io',
         description: "Création de logiciels web complexes via Bubble.io",
-        icon: '..@/assests/logos/bubble-logo.webp',
+        icon: '..@/assets/logos/bubble-logo.webp',
         details: "Conception d'applications web complètes sans programmation, incluant bases de données, workflows et interfaces utilisateurs dynamiques."
     },
     {
         title: 'Low-Code : Wordpress',
         description: "Création de solutions web flexibles combinant les modules WordPress et du code personnalisé",
-        icon: '..@/assests/logos/wordpress.webp',
+        icon: '..@/assets/logos/wordpress.webp',
         details: "Développement accéléré de sites professionnels grâce à l'écosystème WordPress, optimisé par des extensions et du code personnalisé pour des besoins spécifiques."
     },
     {
         title: 'Code : Stack MEVN',
         description: "Élaboration de solutions web sur mesure avec l'architecture MEVN (MongoDB, Express.js, Vue.js, Node.js)",
-        icon: '..@/assests/logos/mevn.webp',
+        icon: '..@/assets/logos/mevn.webp',
         details: "Architecture JavaScript full-stack permettant de créer des applications web performantes, évolutives et réactives avec une expérience utilisateur fluide."
     }
 ])
@@ -27,7 +27,7 @@ const technologies = ref<Technology[]>([
 <template>
     <section class="py-16 bg-primary">
         <div class="container mx-auto p-4">
-            <SectionTitle title="Technologies" astronaut-image="@/assests/illustrations/astronaut-key.svg" />
+            <SectionTitle title="Technologies" astronaut-image="@/assets/illustrations/astronaut-key.svg" />
             <h4 class="text-secondary text-center my-4 italic">Les outils modernes au service de vos ambitions web.</h4>
             <div class="grid md:grid-cols-3 gap-8">
                 <div v-for="technologie in technologies" :key="technologie.title"

@@ -21,9 +21,9 @@ const legalLinks = [
 
 // Liens sociaux (à adapter selon vos réseaux)
 const socialLinks = [
-    //{ url: 'https://instagram.com/', name: 'Instagram', icon: '@/assests/logos/icons8-instagram-sticker.svg' },
-    { url: 'https://github.com/SamySbh', name: 'GitHub', icon: '@/assests/logos/icons8-github-sticker.svg' },
-    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: '@/assests/logos/icons8-linkedin-sticker.svg' }
+    //{ url: 'https://instagram.com/', name: 'Instagram', icon: '@/assets/logos/icons8-instagram-sticker.svg' },
+    { url: 'https://github.com/SamySbh', name: 'GitHub', icon: '@/assets/logos/icons8-github-sticker.svg' },
+    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: '@/assets/logos/icons8-linkedin-sticker.svg' }
 
 ]
 </script>

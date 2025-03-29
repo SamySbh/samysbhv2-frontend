@@ -7,7 +7,7 @@ defineProps({
   },
   astronautImage: {
     type: String,
-    default: () => "@/assests/illustrations/astronaut-spray.svg"
+    default: () => "@/assets/illustrations/astronaut-spray.svg"
   }
 })
 </script>
