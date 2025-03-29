@@ -3,6 +3,10 @@ import { ref } from 'vue';
 import SectionTitle from '@/components/ui/SectionTitle.vue';
 import { AcademicCapIcon, ComputerDesktopIcon, BriefcaseIcon } from '@heroicons/vue/24/solid';
 import { PathStep } from '@/types';
+import logoCloudCampus from '@/assets/logos/LogoBleuOmbre-edited.webp';
+import logoSamy from '@/assets/logos/LogoSamySBHAvecFondGrand.webp';
+import logoShifter from '@/assets/logos/ShifterLogo.svg';
+import astronautFly from '@/assets/illustrations/astronaut-fly.svg';
 
 const myPath = ref<PathStep[]>([
     {
@@ -13,7 +17,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-accent',
         title: 'Formation Chef de Projet Web et Cybersécurité',
         description: 'Maîtrise des compétences en gestion de projet web et protection des systèmes d\'information chez Cloud Campus',
-        logo: '@/assets/logos/LogoBleuOmbre-edited.webp',
+        logo: logoCloudCampus,
         alt: 'Logo Cloud Campus'
     },
     {
@@ -24,7 +28,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-emphasis',
         title: 'Création de Sites Web en Freelance',
         description: 'Conception de solutions web sur mesure pour répondre à vos besoins numériques',
-        logo: '@/assets/logos/LogoSamySBHAvecFondGrand.webp',
+        logo: logoSamy,
         alt: 'Logo Samy'
     },
     {
@@ -35,7 +39,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-emphasis',
         title: 'Poste de Développeur Web en Alternance',
         description: 'Développement No-Code sur la technologie Bubble.io chez Shifter - Logiciel de gestion pour boutiques et ateliers vélo',
-        logo: '@/assets/logos/ShifterLogo.svg',
+        logo: logoShifter,
         alt: 'Logo Shifter'
     },
     {
@@ -46,7 +50,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-accent',
         title: 'Formation Développeur Web FullStack',
         description: 'Acquisition des compétences en développement web moderne chez Cloud Campus',
-        logo: '@/assets/logos/LogoBleuOmbre-edited.webp',
+        logo: astronautFly,
         alt: 'Logo Cloud Campus'
     }
 ]);
