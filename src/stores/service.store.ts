@@ -8,7 +8,7 @@ export const useServiceStore = defineStore('service', () => {
     const service = ref<Service | null>(null)
     const loading = ref<boolean>(false)
     const error = ref<string | null>(null)
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://api.samysbh.fr'
+    const apiUrl = import.meta.env.VITE_API_URL
 
     async function getServices() {
         loading.value = true

@@ -11,12 +11,12 @@ interface AnalyticsOptions {
 
 export default {
     install(app: App, options: AnalyticsOptions = {}) {
-        const GA_ID = options.id || import.meta.env.VITE_GA_ID || ''; // Remplacez par votre ID Google Analytics
+        const GA_ID = options.id || import.meta.env.VITE_GA_ID || '';
 
-        // Vérifier le consentement existant
+        // Vérifier le consentement
         const hasConsent = localStorage.getItem('cookie_consent') === 'accepted'
 
-        // Configuration de base
+        // Configuration
         const config = {
             config: {
                 id: GA_ID,
@@ -29,7 +29,6 @@ export default {
             bootstrap: hasConsent
         }
 
-        // Installer Vue-gtag avec le routeur si fourni
         app.use(VueGtag, config, options.router)
 
         // Écouter les changements de consentement
@@ -44,8 +43,7 @@ export default {
                     })
                 }
 
-                // Si le consentement était précédemment refusé, recharger la page
-                // pour initialiser correctement Google Analytics
+                // Si le consentement était refusé, recharger la page
                 if (localStorage.getItem('cookie_consent') !== 'accepted') {
                     window.location.reload()
                 }
