@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { useServiceStore } from '../stores'
+import { useServiceStore } from '@/stores'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import ServiceCard from '@/components/services/ServiceCard.vue'
 

@@ -50,7 +50,7 @@ const myPath = ref<PathStep[]>([
         shadowColor: 'hover:shadow-accent',
         title: 'Formation Développeur Web FullStack',
         description: 'Acquisition des compétences en développement web moderne chez Cloud Campus',
-        logo: astronautFly,
+        logo: logoCloudCampus,
         alt: 'Logo Cloud Campus'
     }
 ]);
@@ -58,7 +58,7 @@ const myPath = ref<PathStep[]>([
 <template>
     <section class="py-12 px-2 md:px-4 bg-primary">
         <div class="container mx-auto">
-            <SectionTitle title="Mon Parcours" astronaut-image="@/assets/illustrations/astronaut-fly.svg" />
+            <SectionTitle title="Mon Parcours" :astronaut-image="astronautFly" />
             <h4 class="text-secondary text-center my-4 italic">Les expériences qui ont façonné mes compétences
                 actuelles.
             </h4>

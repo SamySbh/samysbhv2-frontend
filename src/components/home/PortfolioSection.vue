@@ -2,12 +2,16 @@
 import { ref } from 'vue';
 import { Project } from '@/types'
 import SectionTitle from '@/components/ui/SectionTitle.vue';
+import umai from '@/assets/illustrations/slide2-umai.webp';
+import cleanovia from '@/assets/illustrations/slide-cleanovia.webp';
+import lister from '@/assets/illustrations/myapptodo.webp';
+import astronautPaint from '@/assets/illustrations/astronaut-paint.svg'
 
 const portfolio = ref<Project[]>([
     {
         title: 'Umaï',
         description: "La vitrine numérique d'un restaurant franco-asiatique",
-        image: '@/assets/illustrations/slide2-umai.webp',
+        image: umai,
         tags: [
             {
                 title: "Code",
@@ -26,7 +30,7 @@ const portfolio = ref<Project[]>([
     {
         title: 'Cleanovia',
         description: "La carte de visite en ligne d'une entreprise de services personnalisés",
-        image: '@/assets/illustrations/slide-cleanovia.webp',
+        image: cleanovia,
         tags: [
             {
                 title: "Low-Code",
@@ -45,7 +49,7 @@ const portfolio = ref<Project[]>([
     {
         title: 'Lister',
         description: "Une plateforme web d'organisation de tâches et des projets",
-        image: '@/assets/illustrations/myapptodo.webp',
+        image: lister,
         tags: [
             {
                 title: "No-Code",
@@ -61,11 +65,12 @@ const portfolio = ref<Project[]>([
             }
         ]
     }
-]);</script>
+]);
+</script>
 <template>
     <section class="py-16 bg-primary">
         <div class="container mx-auto px-2 lg:px-4">
-            <SectionTitle title="Mes Réalisations" astronautImage="@/assets/illustrations/astronaut-paint.svg" />
+            <SectionTitle title="Mes Réalisations" :astronautImage="astronautPaint" />
             <h4 class="text-secondary text-center my-4 italic">Des réalisations concrètes qui parlent mieux que des
                 mots.
             </h4>

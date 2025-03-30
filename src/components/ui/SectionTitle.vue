@@ -1,5 +1,5 @@
-<!-- SectionTitle.vue -->
 <script setup lang="ts">
+import astronautSpray from '@/assets/illustrations/astronaut-spray.svg' 
 defineProps({
   title: {
     type: String,
@@ -7,7 +7,7 @@ defineProps({
   },
   astronautImage: {
     type: String,
-    default: () => "@/assets/illustrations/astronaut-spray.svg"
+    default: () => astronautSpray
   }
 })
 </script>

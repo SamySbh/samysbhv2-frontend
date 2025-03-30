@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import gitHub from '@/assets/logos/icons8-github-sticker.svg'
+import linkedIn from '@/assets/logos/icons8-linkedin-sticker.svg'
 
 // Année courante pour le copyright
 const currentYear = new Date().getFullYear()
@@ -22,10 +24,9 @@ const legalLinks = [
 // Liens sociaux (à adapter selon vos réseaux)
 const socialLinks = [
     //{ url: 'https://instagram.com/', name: 'Instagram', icon: '@/assets/logos/icons8-instagram-sticker.svg' },
-    { url: 'https://github.com/SamySbh', name: 'GitHub', icon: '@/assets/logos/icons8-github-sticker.svg' },
-    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: '@/assets/logos/icons8-linkedin-sticker.svg' }
-
-]
+    { url: 'https://github.com/SamySbh', name: 'GitHub', icon: gitHub },
+    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: linkedIn }
+    ]
 </script>
 
 <template>
@@ -48,7 +49,8 @@ const socialLinks = [
                 <div class="flex flex-col items-center">
                     <h3 class="font-semibold text-lg mb-4">Navigation</h3>
                     <div class="flex flex-col space-y-2">
-                        <RouterLink v-for="link in mainLinks" :key="link.path" :to="link.path" class="hover:text-primary">
+                        <RouterLink v-for="link in mainLinks" :key="link.path" :to="link.path"
+                            class="hover:text-primary">
                             {{ link.name }}
                         </RouterLink>
                     </div>
@@ -58,8 +60,9 @@ const socialLinks = [
                 <div class="flex flex-col items-center md:items-start">
                     <h3 class="font-semibold text-lg mb-4">Contact</h3>
                     <address class="not-italic text-sm flex flex-col space-y-2">
-                        <p class="hover:text-primary">Email : <a href="mailto:samy.sebahi@yahoo.com" class="mailto">samy.sebahi@yahoo.com</a></p>
-                        <p class="hover:text-primary">Téléphone : <a href="tel:+33769684368" >+33 7 69 68 43 68</a></p>
+                        <p class="hover:text-primary">Email : <a href="mailto:samy.sebahi@yahoo.com"
+                                class="mailto">samy.sebahi@yahoo.com</a></p>
+                        <p class="hover:text-primary">Téléphone : <a href="tel:+33769684368">+33 7 69 68 43 68</a></p>
                     </address>
                     <!-- Réseaux sociaux -->
                     <div class="flex space-x-4 mt-4">

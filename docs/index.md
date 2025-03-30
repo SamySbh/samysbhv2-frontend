@@ -6,7 +6,7 @@ hero:
   text: "Documentation de mon site de ventes de prestations web"
   tagline: Guide complet pour développeurs et utilisateurs
   image:
-    src: @/assets/logos/LogoSamySbhAvecFond.svg
+    src: /assets/logos/LogoSamySbhAvecFond.svg
     alt: Logo SamySBH
   actions:
     - theme: brand
