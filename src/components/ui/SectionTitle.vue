@@ -7,7 +7,7 @@ defineProps({
   },
   astronautImage: {
     type: String,
-    default: () => astronautSpray
+    default: astronautSpray
   }
 })
 </script>
