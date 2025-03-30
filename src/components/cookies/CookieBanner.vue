@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import useCookieConsent from '@/composables/useCookieConsent'
-
 const { needsConsent, acceptCookies, rejectCookies } = useCookieConsent()
 </script>
 
