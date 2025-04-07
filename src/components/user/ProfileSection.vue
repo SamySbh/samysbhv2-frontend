@@ -9,6 +9,7 @@ const { currentUser, loading } = storeToRefs(authStore);
 
 // État pour le mode édition
 const isEditing = ref(false);
+const isDeleting = ref(false)
 const showPasswordForm = ref(false);
 const submitStatus = ref({ success: false, message: '' });
 
@@ -50,6 +51,13 @@ const toggleEditMode = () => {
     initProfileForm();
   }
 };
+
+
+//Activer la suppression
+const toggleDeleteAccount = () => {
+  isDeleting.value = !isDeleting.value;
+};
+
 
 // Réinitialiser le formulaire
 const cancelEdit = () => {
@@ -196,14 +204,30 @@ const formattedRole = computed(() => {
 </script>
 
 <template>
-  <div class="bg-secondary-ghost rounded-lg shadow p-6">
+  <div v-if="isDeleting" class=" bg-secondary-ghost rounded-lg flex flex-col px-8 py-4">
+    <div class="px-8 py-4 border border-red-500 rounded-md space-y-2">
+      <p>Vous êtes sur le point de supprimer définitivement votre compte. Cette action ne peut pas être annulée.</p>
+      <p>La suppression de votre compte entraînera :</p>
+      <ul class="list-disc ml-6">
+        <li>La perte de toutes vos données personnelles</li>
+        <li>La résiliation immédiate de tout abonnement actif</li>
+        <li>La suppression de votre historique et de vos préférences</li>
+      </ul>
+      <p>Vos factures resteront accessibles conformément à nos obligations légales.</p>
+      <div class="flex gap-2 justify-end">
+        <button class="bg-gray-300 text-primary px-4 py-2 rounded-md" @click="toggleDeleteAccount">Annuler</button>
+        <button class="bg-red-500 text-secondary px-4 py-2 rounded-md">Confirmer la suppression</button>
+      </div>
+    </div>
+  </div>
+  <div v-if="!isDeleting" class="bg-secondary-ghost rounded-lg shadow p-6">
 
     <!-- Message de statut après soumission -->
     <div v-if="submitStatus.message" :class="[
       'p-4 mb-4 rounded',
       submitStatus.success
-        ? 'bg-green-100 border-l-4 border-green-500 text-green-700'
-        : 'bg-red-100 border-l-4 border-red-500 text-red-700'
+        ? 'bg-green-500 text-secondary'
+        : 'bg-red-500 text-secondary'
     ]">
       {{ submitStatus.message }}
     </div>
@@ -235,10 +259,15 @@ const formattedRole = computed(() => {
           </div>
 
           <!-- Bouton d'édition -->
-          <button @click="toggleEditMode"
-            class="bg-accent text-secondary px-4 py-2 rounded transition-colors hover:bg-accent-light">
-            Modifier mon profil
-          </button>
+          <div class="flex gap-2">
+            <button @click="toggleEditMode" class="bg-accent text-secondary px-4 py-2 rounded transition-colors">
+              Modifier mon profil
+            </button>
+            <button @click="toggleDeleteAccount"
+              class="bg-red-500 text-secondary text-sm px-2 py-1 rounded transition-colors">
+              Supprimer mon compte
+            </button>
+          </div>
         </div>
 
         <!-- Détails du profil -->

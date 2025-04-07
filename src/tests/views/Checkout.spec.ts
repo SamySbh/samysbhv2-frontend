@@ -1,4 +1,4 @@
-// src/components/tests/Checkout.spec.ts
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';

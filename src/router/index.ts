@@ -80,9 +80,28 @@ const routes = [
     path: '/payment/cancel',
     name: 'PaymentCancel',
     component: () => import('@/views/PaymentCancel.vue'),
-    props: (route: RouteLocationNormalized) => ({ sessionId: route.query.session_id }),
     meta: { title: 'Paiement annulé', requiresAuth: true }
-  }
+  },
+  {
+    path: '/mentions-legales',
+    name: 'TermsOfUse',
+    component: () => import('@/views/TermsOfUse.vue'),
+    props: (route: RouteLocationNormalized) => ({ sessionId: route.query.session_id }),
+    meta: { title: 'Mentions légales', requiresAuth: true }
+  },
+  {
+    path: '/politique-confidentialite',
+    name: 'PrivacyPolicy',
+    component: () => import('@/views/PrivacyPolicy.vue'),
+    props: (route: RouteLocationNormalized) => ({ sessionId: route.query.session_id }),
+    meta: { title: 'Politique de confidentialité', requiresAuth: true }
+  },
+  {
+    path: '/cgv',
+    name: 'TermsAndConditions',
+    component: () => import('@/views/TermsAndConditions.vue'),
+    meta: { title: 'Conditions générales de ventes', requiresAuth: true }
+  },
 ];
 
 const router = createRouter({
@@ -96,7 +115,7 @@ const router = createRouter({
 
 // Middlewares
 router.beforeEach(async (to, _from) => {
-  document.title = to.meta?.title ? `Samy SBH | ${to.meta.title}` : 'Mon App'
+  document.title = to.meta?.title ? `SamySBH | ${to.meta.title}` : 'SamySBH'
 
   const authStore = useAuthStore()
   const token = localStorage.getItem("accessToken")
