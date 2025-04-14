@@ -3,7 +3,8 @@ import { Service } from '@/types/service';
 import { CheckBadgeIcon } from '@heroicons/vue/24/solid';
 
 // Props
-const props = defineProps<{
+
+defineProps<{
     service: Service;
 }>();
 

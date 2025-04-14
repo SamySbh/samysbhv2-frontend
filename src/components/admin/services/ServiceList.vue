@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useServiceStore } from '@/stores/service.store';
 import { storeToRefs } from 'pinia';
 import { Service } from '@/types/service';
