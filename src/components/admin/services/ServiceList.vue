@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useServiceStore } from '@/stores/service.store';
 import { storeToRefs } from 'pinia';
 import { Service } from '@/types/service';
@@ -16,6 +16,30 @@ const showCreateModal = ref(false);
 const showEditModal = ref(false);
 const showDetailsModal = ref(false);
 const selectedService = ref<Service | null>(null);
+
+// Fonction pour formater correctement l'URL de l'image
+const getImageUrl = (imageUrl: string | undefined) => {
+    if (!imageUrl) return '';
+
+    // Si l'URL est déjà complète (commence par http ou https)
+    if (imageUrl.startsWith('http')) {
+        return imageUrl;
+    }
+
+    // Si l'image a un chemin qui inclut /src/assets/uploads/, transformer en URL backend
+    if (imageUrl.includes('/src/assets/uploads/')) {
+        const filename = imageUrl.split('/').pop();
+        return `${import.meta.env.VITE_API_URL || 'https://backend.samysbh.fr'}/uploads/${filename}`;
+    }
+
+    // Si l'image a déjà le format /uploads/
+    if (imageUrl.startsWith('/uploads/')) {
+        return `${import.meta.env.VITE_API_URL || 'https://backend.samysbh.fr'}${imageUrl}`;
+    }
+
+    // Fallback - retourner l'image telle quelle
+    return imageUrl;
+};
 
 // Chargement des services
 onMounted(async () => {
@@ -98,7 +122,7 @@ const refreshList = async () => {
             <div v-for="service in services" :key="service.id"
                 class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow">
                 <div class="aspect-w-16 aspect-h-9 bg-gray-100">
-                    <img :src="service.image" :alt="service.name" class="object-cover w-full h-48"
+                    <img :src="getImageUrl(service.image)" :alt="service.name" class="object-cover w-full h-48"
                         @error="($event.target as HTMLImageElement).src = ''" />
                 </div>
 

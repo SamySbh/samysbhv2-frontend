@@ -3,7 +3,7 @@ import { Service } from '@/types/service';
 import { CheckBadgeIcon } from '@heroicons/vue/24/solid';
 
 // Props
-defineProps<{
+const props = defineProps<{
     service: Service;
 }>();
 
@@ -11,6 +11,30 @@ defineProps<{
 const emit = defineEmits<{
     (e: 'close'): void;
 }>();
+
+// Fonction pour formater correctement l'URL de l'image
+const getImageUrl = (imageUrl: string | undefined) => {
+    if (!imageUrl) return '';
+
+    // Si l'URL est déjà complète (commence par http ou https)
+    if (imageUrl.startsWith('http')) {
+        return imageUrl;
+    }
+
+    // Si l'image a un chemin qui inclut /src/assets/uploads/, transformer en URL backend
+    if (imageUrl.includes('/src/assets/uploads/')) {
+        const filename = imageUrl.split('/').pop();
+        return `${import.meta.env.VITE_API_URL || 'https://backend.samysbh.fr'}/uploads/${filename}`;
+    }
+
+    // Si l'image a déjà le format /uploads/
+    if (imageUrl.startsWith('/uploads/')) {
+        return `${import.meta.env.VITE_API_URL || 'https://backend.samysbh.fr'}${imageUrl}`;
+    }
+
+    // Fallback - retourner l'image telle quelle
+    return imageUrl;
+};
 
 // Fermer le modal
 const closeModal = () => {
@@ -32,7 +56,8 @@ const closeModal = () => {
             <div class="px-6 py-4 max-h-[70vh] overflow-y-auto">
                 <!-- Image -->
                 <div class="mb-6">
-                    <img :src="service.image" :alt="service.name" class="w-full h-48 object-cover rounded shadow-sm"
+                    <img :src="getImageUrl(service.image)" :alt="service.name"
+                        class="w-full h-48 object-cover rounded shadow-sm"
                         @error="($event.target as HTMLImageElement).src = ''" />
                 </div>
 
@@ -71,13 +96,14 @@ const closeModal = () => {
                         <h3 class="text-sm font-medium text-accent mb-2">Description</h3>
                         <p class="text-primary whitespace-pre-line">{{ service.description }}</p>
                     </div>
-                    
+
                     <!-- Caractéristiques -->
                     <div v-if="service.features && service.features.length > 0">
                         <h3 class="text-sm font-medium text-accent mb-2">Caractéristiques</h3>
                         <ul class="space-y-1 pl-2">
-                            <li v-for="(feature, index) in service.features" :key="index" class="flex items-center gap-1">
-                                <CheckBadgeIcon class="w-4 text-emphasis"/>
+                            <li v-for="(feature, index) in service.features" :key="index"
+                                class="flex items-center gap-1">
+                                <CheckBadgeIcon class="w-4 text-emphasis" />
                                 <span class="text-primary">{{ feature }}</span>
                             </li>
                         </ul>
