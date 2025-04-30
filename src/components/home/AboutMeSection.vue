@@ -30,15 +30,6 @@ import astronautMoon from '@/assets/illustrations/astronaut-moon.svg';
                             expérience utilisateur intuitive, pour des solutions web répondant précisément à vos
                             besoins.
                         </p>
-                        <blockquote class="space-y-2 p-4 text-primary">
-                            <p class="italic text-sm text-left">
-                                Visez la lune.<br>Même si vous la manquez, vous atterrirez parmi les étoiles. <span
-                                    class="not-italic">🌕 ✨</span>
-                            </p>
-                            <footer class="text-left text-sm">
-                                — Norman Vincent Peale
-                            </footer>
-                        </blockquote>
                     </div>
                 </div>
             </div>
