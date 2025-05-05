@@ -8,7 +8,7 @@ import ServiceCard from '@/components/services/ServiceCard.vue'
 const serviceStore = useServiceStore()
 
 // Computed pour ne garder que les services actifs
-const activeServices = computed(() => 
+const activeServices = computed(() =>
   serviceStore.services.filter(service => service.isActive)
 )
 
@@ -21,15 +21,16 @@ onMounted(() =>
     <div class="container mx-auto px-4">
       <div class="max-w-3xl mx-auto text-center mb-16">
         <SectionTitle title="Mes Services" />
-        <p class="text-xl text-secondary">
-          L'ensemble de nos solutions pour transformer vos ambitions en réalités.
-        </p>
+        <div class="text-xl text-secondary">
+          <p v-if="activeServices">
+            L'ensemble de nos solutions pour transformer vos ambitions en réalités.
+          </p>
+          <p v-else>Je travaille actuellement à l'élaboration de nouveaux services pour vous. Merci de votre patience !
+          </p>
+        </div>
       </div>
       <section class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <ServiceCard 
-          v-for="service in activeServices" 
-          :key="service.id" 
-          :service="service">
+        <ServiceCard v-for="service in activeServices" :key="service.id" :service="service">
         </ServiceCard>
       </section>
       <div class="grid md:grid-cols-3 gap-8">
