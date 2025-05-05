@@ -22,7 +22,7 @@ onMounted(() =>
       <div class="max-w-3xl mx-auto text-center mb-16">
         <SectionTitle title="Mes Services" />
         <div class="text-xl text-secondary">
-          <p v-if="activeServices">
+          <p v-if="activeServices.length > 0">
             L'ensemble de nos solutions pour transformer vos ambitions en réalités.
           </p>
           <p v-else>Je travaille actuellement à l'élaboration de nouveaux services pour vous. Merci de votre patience !
