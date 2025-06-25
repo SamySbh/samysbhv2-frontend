@@ -25,7 +25,7 @@ const legalLinks = [
 const socialLinks = [
     //{ url: 'https://instagram.com/', name: 'Instagram', icon: '@/assets/logos/icons8-instagram-sticker.svg' },
     { url: 'https://github.com/SamySbh', name: 'GitHub', icon: gitHub },
-    { url: 'https://www.linkedin.com/in/samy-sebahi-9729a4246/', name: 'LinkedIn', icon: linkedIn }
+    { url: 'https://www.linkedin.com/in/samysbh/', name: 'LinkedIn', icon: linkedIn }
     ]
 </script>
 
