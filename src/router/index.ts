@@ -87,20 +87,20 @@ const routes = [
     name: 'TermsOfUse',
     component: () => import('@/views/TermsOfUse.vue'),
     props: (route: RouteLocationNormalized) => ({ sessionId: route.query.session_id }),
-    meta: { title: 'Mentions légales', requiresAuth: true }
+    meta: { title: 'Mentions légales' }
   },
   {
     path: '/politique-confidentialite',
     name: 'PrivacyPolicy',
     component: () => import('@/views/PrivacyPolicy.vue'),
     props: (route: RouteLocationNormalized) => ({ sessionId: route.query.session_id }),
-    meta: { title: 'Politique de confidentialité', requiresAuth: true }
+    meta: { title: 'Politique de confidentialité' }
   },
   {
     path: '/cgv',
     name: 'TermsAndConditions',
     component: () => import('@/views/TermsAndConditions.vue'),
-    meta: { title: 'Conditions générales de ventes', requiresAuth: true }
+    meta: { title: 'Conditions générales de ventes' }
   },
 ];
 
