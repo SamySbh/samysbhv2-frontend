@@ -10,6 +10,126 @@ export const useAuthStore = defineStore('auth', () => {
     const error = ref<string | null>(null)
     const isAuthenticated = ref<boolean>(false)
     const apiUrl = import.meta.env.VITE_API_URL
+    const isRefreshing = ref<boolean>(false)
+    const refreshSubscribers: ((token: string) => void)[] = []
+    
+    // Obtenir les tokens du localStorage
+    const getAccessToken = (): string | null => localStorage.getItem('accessToken')
+    const getRefreshToken = (): string | null => localStorage.getItem('refreshToken')
+
+    // Mettre à jour les tokens dans le localStorage
+    function setTokens(accessToken: string, refreshToken?: string): void {
+        localStorage.setItem('accessToken', accessToken)
+        
+        if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken)
+        }
+    }
+
+    // Effacer les tokens du localStorage
+    function clearTokens(): void {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+    }
+
+    // Fonction pour rafraîchir le token d'accès
+    async function refreshToken(): Promise<string> {
+        if (isRefreshing.value) {
+            return new Promise((resolve) => {
+                refreshSubscribers.push(resolve)
+            })
+        }
+
+        isRefreshing.value = true
+        const storedRefreshToken = getRefreshToken()
+
+        if (!storedRefreshToken) {
+            throw new Error('Refresh token non disponible')
+        }
+
+        try {
+            const response = await fetch(`${apiUrl}/auth/refresh-token`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ refreshToken: storedRefreshToken })
+            })
+
+            const data = await response.json() as AuthResponse
+
+            if (!response.ok) {
+                throw new Error(data.message || `Erreur HTTP: ${response.status}`)
+            }
+
+            if (data.success === false) {
+                throw new Error(data.message || 'Erreur lors du rafraîchissement du token')
+            }
+
+            if (data.data && data.data.accessToken) {
+                const newAccessToken = data.data.accessToken
+                const newRefreshToken = data.data.refreshToken
+                
+                setTokens(newAccessToken, newRefreshToken)
+                isAuthenticated.value = true
+                
+                // Notifier tous les abonnés en attente
+                refreshSubscribers.forEach(callback => callback(newAccessToken))
+                refreshSubscribers.length = 0
+                
+                return newAccessToken
+            }
+            
+            throw new Error('Tokens non disponibles dans la réponse')
+        } catch (err) {
+            console.error("Erreur lors du rafraîchissement du token:", err)
+            isAuthenticated.value = false
+            currentUser.value = null
+            clearTokens()
+            throw err
+        } finally {
+            isRefreshing.value = false
+        }
+    }
+
+    // Fonction utilitaire pour faire une requête avec gestion du refresh token
+    async function fetchWithTokenRefresh(url: string, options: RequestInit): Promise<Response> {
+        // Obtenir le token d'accès actuel
+        const token = getAccessToken()
+        const headers = {
+            ...(options.headers || {}),
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+
+        // Première tentative avec le token actuel
+        let response = await fetch(url, {
+            ...options,
+            headers
+        })
+
+        // Si on reçoit une erreur 401, essayer de rafraîchir le token
+        if (response.status === 401 && getRefreshToken()) {
+            try {
+                // Rafraîchir le token
+                const newToken = await refreshToken()
+                
+                // Réessayer la requête avec le nouveau token
+                return fetch(url, {
+                    ...options,
+                    headers: {
+                        ...(options.headers || {}),
+                        'Authorization': `Bearer ${newToken}`
+                    }
+                })
+            } catch (refreshError) {
+                // Si le rafraîchissement échoue, propager l'erreur
+                console.error("Erreur lors du rafraîchissement du token:", refreshError)
+                throw refreshError
+            }
+        }
+
+        return response
+    }
 
     async function register(userData: RegisterData): Promise<AuthResponse> {
         loading.value = true
@@ -70,7 +190,8 @@ export const useAuthStore = defineStore('auth', () => {
             }
 
             if (data.data && data.data.accessToken) {
-                localStorage.setItem('accessToken', data.data.accessToken)
+                // Stocker les deux tokens
+                setTokens(data.data.accessToken, data.data.refreshToken)
                 isAuthenticated.value = true
                 
                 if (data.data.user) {
@@ -90,7 +211,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function logout(): Promise<void> {
         // Supprimer les tokens du localStorage
-        localStorage.removeItem('accessToken')
+        clearTokens()
 
         // Réinitialiser l'état
         isAuthenticated.value = false
@@ -102,8 +223,8 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            const response = await fetch(`${apiUrl}/auth/profile`, {
-                headers: getAuthHeaders()
+            const response = await fetchWithTokenRefresh(`${apiUrl}/auth/profile`, {
+                method: 'GET'
             })
 
             // Lire la réponse, qu'elle soit réussie ou non
@@ -134,7 +255,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function checkAuth(): Promise<boolean> {
-        const token = localStorage.getItem('accessToken')
+        const token = getAccessToken()
 
         if (!token) {
             isAuthenticated.value = false
@@ -143,8 +264,8 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         try {
-            const response = await fetch(`${apiUrl}/auth/profile`, {
-                headers: getAuthHeaders()
+            const response = await fetchWithTokenRefresh(`${apiUrl}/auth/profile`, {
+                method: 'GET'
             })
 
             // Lire la réponse, qu'elle soit réussie ou non
@@ -165,7 +286,7 @@ export const useAuthStore = defineStore('auth', () => {
             console.error("Erreur lors de la vérification d'authentification:", err)
             isAuthenticated.value = false
             currentUser.value = null
-            localStorage.removeItem('accessToken')
+            clearTokens()
             return false
         }
     }
@@ -175,10 +296,9 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null
 
         try {
-            const response = await fetch(`${apiUrl}/auth/profile`, {
+            const response = await fetchWithTokenRefresh(`${apiUrl}/auth/profile`, {
                 method: 'PUT',
                 headers: {
-                    ...getAuthHeaders(),
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(profileData)
@@ -227,6 +347,7 @@ export const useAuthStore = defineStore('auth', () => {
         getProfile,
         checkAuth,
         updateProfile,
-        resetState
+        resetState,
+        refreshToken // Exposer la méthode de rafraîchissement
     };
 })
