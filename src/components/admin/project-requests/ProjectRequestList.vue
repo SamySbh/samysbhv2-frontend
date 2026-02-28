@@ -467,7 +467,7 @@ onMounted(() => {
                     </BaseButton>
 
                     <BaseButton
-                        v-if="request.orderId && !request.order?.depositPaidAt"
+                        v-if="request.orderId"
                         variant="primary"
                         size="sm"
                         :disabled="actionLoading === request.id"
@@ -477,7 +477,7 @@ onMounted(() => {
                     </BaseButton>
 
                     <BaseButton
-                        v-if="request.orderId && request.order?.depositPaidAt && !request.order?.finalPaidAt"
+                        v-if="request.orderId"
                         variant="accent"
                         size="sm"
                         :disabled="actionLoading === request.id"
@@ -485,13 +485,6 @@ onMounted(() => {
                     >
                         Générer lien solde (70%)
                     </BaseButton>
-
-                    <span
-                        v-if="request.order?.finalPaidAt"
-                        class="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium"
-                    >
-                        Payé intégralement
-                    </span>
 
                     <a
                         :href="`mailto:${request.email}?subject=Votre demande de devis - ${request.name}`"

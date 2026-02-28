@@ -31,14 +31,6 @@ const finalAmount = computed(() => {
     return (props.totalAmount - props.depositAmount).toFixed(2);
 });
 
-const currentAmount = computed(() => {
-    return isDeposit.value ? props.depositAmount : props.totalAmount - props.depositAmount;
-});
-
-const modalTitle = computed(() => {
-    return isDeposit.value ? 'Lien de paiement - Acompte (30%)' : 'Lien de paiement - Solde (70%)';
-});
-
 // Formater le prix
 function formatPrice(price: number): string {
     return new Intl.NumberFormat('fr-FR', {
