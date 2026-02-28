@@ -19,7 +19,7 @@ const emit = defineEmits([
 ]);
 
 // Méthode pour changer de section
-const setActiveSection = (section: 'users' | 'orders' | 'orderItems' | 'services') => {
+const setActiveSection = (section: 'users' | 'orders' | 'ordersAdmin' | 'orderItems' | 'services' | 'projectRequests') => {
     emit('changeSection', section);
     // Fermer le menu automatiquement sur mobile
     emit('closeMobileMenu');
@@ -52,7 +52,16 @@ const setActiveSection = (section: 'users' | 'orders' | 'orderItems' | 'services
                     ? 'bg-accent text-secondary font-medium'
                     : 'hover:bg-secondary-ghost text-white hover:text-accent'
             ]" type="button">
-                Commandes
+                Commandes (CRUD)
+            </button>
+
+            <button @click="setActiveSection('ordersAdmin')" :class="[
+                'w-full text-left px-4 py-3 rounded transition-colors',
+                activeSection === 'ordersAdmin'
+                    ? 'bg-accent text-secondary font-medium'
+                    : 'hover:bg-secondary-ghost text-white hover:text-accent'
+            ]" type="button">
+                Suivi des commandes
             </button>
 
             <button @click="setActiveSection('orderItems')" :class="[
@@ -71,6 +80,15 @@ const setActiveSection = (section: 'users' | 'orders' | 'orderItems' | 'services
                     : 'hover:bg-secondary-ghost text-white hover:text-accent'
             ]" type="button">
                 Services
+            </button>
+
+            <button @click="setActiveSection('projectRequests')" :class="[
+                'w-full text-left px-4 py-3 rounded transition-colors',
+                activeSection === 'projectRequests'
+                    ? 'bg-accent text-secondary font-medium'
+                    : 'hover:bg-secondary-ghost text-white hover:text-accent'
+            ]" type="button">
+                Demandes de projet
             </button>
         </nav>
     </aside>

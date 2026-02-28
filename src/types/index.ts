@@ -15,5 +15,6 @@ export * from './contact-form';
 export * from './file-uploader';
 export * from './process';
 export * from './preview-service';
-export * from './profile.ts'
+export * from './profile'
+export * from './projectRequest'
 

@@ -1,182 +1,104 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useOrderStore } from '../stores/order.store';
-import { usePaymentStore } from '../stores/payment.store';
-import type { Order } from '../types';
-import { CheckBadgeIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/solid';
+import { useRoute } from 'vue-router';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseAlert from '@/components/ui/BaseAlert.vue';
 
-// Props
-const props = defineProps<{
-    sessionId?: string
-}>();
-
-// Hooks
 const route = useRoute();
-const router = useRouter();
-const orderStore = useOrderStore();
-const paymentStore = usePaymentStore();
+const orderId = ref<string>('');
 
-// Reactive state
-const orderDetails = ref<Order | null>(null);
-const loading = ref<boolean>(false);
-const error = ref<string | null>(null);
-const isRetrying = ref<boolean>(false);
-
-// Récupérer le sessionId à partir des props ou du query param
-const sessionId = props.sessionId || route.query.session_id as string;
-
-const recommendations: string[] = [
-    "Vérifiez les informations de votre carte bancaire",
-    "Assurez-vous que votre carte est autorisée pour les paiements en ligne",
-    "Contactez votre banque si le problème persiste"
-]
-
-// Methods
-const fetchOrderDetails = async () => {
-    if (!sessionId) {
-        error.value = "Impossible de récupérer les détails de la commande";
-        return;
-    }
-
-    loading.value = true;
-    error.value = null;
-
-    try {
-        const order = await orderStore.getOrderBySessionId(sessionId);
-        orderDetails.value = order;
-    } catch (err) {
-        console.error('Erreur lors de la récupération de la commande:', err);
-        error.value = err instanceof Error ? err.message : 'Erreur inconnue';
-    } finally {
-        loading.value = false;
-    }
-};
-
-const retryPayment = async () => {
-    if (!orderDetails.value || !orderDetails.value.id) return;
-
-    isRetrying.value = true;
-
-    try {
-        const sessionUrl = await paymentStore.createCheckoutSession(orderDetails.value.id);
-        if (sessionUrl) {
-            window.location.href = String(sessionUrl);
-        } else {
-            throw new Error("Impossible de créer une session de paiement");
-        }
-    } catch (err) {
-        console.error('Erreur lors de la création d\'une nouvelle session de paiement:', err);
-        error.value = err instanceof Error ? err.message : 'Erreur inconnue';
-    } finally {
-        isRetrying.value = false;
-    }
-};
-
-const contactSupport = () => {
-    // Rediriger vers la page de contact ou ouvrir un modal
-    router.push('/contact');
-};
-
-const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(price);
-};
-
-const translateError = (errorMessage: string): string => {
-    // Traduire les messages d'erreur de Stripe en français
-    if (errorMessage.includes('card_declined')) {
-        return "Votre carte a été refusée par la banque";
-    } else if (errorMessage.includes('insufficient_funds')) {
-        return "Fonds insuffisants sur votre carte";
-    } else if (errorMessage.includes('expired_card')) {
-        return "Votre carte est expirée";
-    } else if (errorMessage.includes('incorrect_cvc')) {
-        return "Le code de sécurité (CVC) est incorrect";
-    }
-
-    return "Une erreur est survenue lors du traitement du paiement";
-};
-
-// Lifecycle hooks
 onMounted(() => {
-    fetchOrderDetails();
+    orderId.value = route.params.id as string;
 });
 </script>
 
 <template>
-    <div class="min-h-screen bg-primary py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md mx-auto bg-secondary-ghost rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-            <div class="md:flex">
-                <div class="p-8 w-full">
-                    <div class="flex justify-center mb-6">
-                        <ExclamationTriangleIcon class="w-12 text-red-500" />
+    <div class="min-h-screen bg-primary py-12 px-4">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-secondary-ghost rounded-lg shadow-md overflow-hidden">
+
+                <!-- Header annulation -->
+                <div class="bg-warning/10 border-b-4 border-warning p-8 text-center">
+                    <div class="w-20 h-20 bg-warning rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-10 h-10 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
                     </div>
+                    <h1 class="text-2xl font-bold text-warning mb-2">Paiement annulé</h1>
+                    <p class="text-primary-ghost">
+                        Vous avez annulé le processus de paiement. Aucun montant n'a été débité.
+                    </p>
+                </div>
 
-                    <div class="text-center">
-                        <h1 class="text-2xl font-bold text-primary mb-2">Paiement non finalisé</h1>
-                        <p class="text-primary-ghost mb-6">
-                            Nous n'avons pas pu traiter votre paiement. Votre commande est en attente.
-                        </p>
+                <div class="p-6 space-y-6">
 
-                        <div v-if="orderDetails" class="mb-6 bg-gray-50 p-4 rounded-lg">
-                            <h2 class="text-lg font-medium text-primary mb-2">Détails de la commande</h2>
-                            <div class="text-sm text-primary-ghost space-y-1">
-                                <p><span class="font-medium">Numéro de commande:</span> #{{ orderDetails.id }}</p>
-                                <p><span class="font-medium">Montant total:</span> {{
-                                    formatPrice(orderDetails.totalAmount) }}</p>
-                                <div v-if="orderDetails.paymentError" class="mt-3 text-red-600">
-                                    <p class="font-medium">Motif:</p>
-                                    <p>{{ translateError(orderDetails.paymentError) }}</p>
-                                </div>
+                    <!-- Explication -->
+                    <BaseAlert variant="warning">
+                        <div>
+                            <strong class="block mb-2">Que s'est-il passé ?</strong>
+                            <p class="text-sm mb-2">Le paiement n'a pas été finalisé. Cela peut arriver si vous avez :</p>
+                            <ul class="text-sm list-disc pl-5 space-y-1">
+                                <li>Cliqué sur le bouton "Retour" de votre navigateur</li>
+                                <li>Fermé la fenêtre de paiement</li>
+                                <li>Annulé volontairement la transaction</li>
+                            </ul>
+                        </div>
+                    </BaseAlert>
+
+                    <!-- Options -->
+                    <div class="space-y-4">
+                        <h2 class="text-lg font-semibold text-primary text-center">Que faire maintenant ?</h2>
+
+                        <!-- Réessayer -->
+                        <div class="flex gap-4 items-start bg-secondary rounded-lg p-4 border border-primary-ghost/20">
+                            <span class="flex-shrink-0 w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-xl">
+                                <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </span>
+                            <div class="flex-1">
+                                <strong class="block text-primary mb-1">Réessayer le paiement</strong>
+                                <p class="text-sm text-primary-ghost mb-3">Vous pouvez retourner à votre commande et relancer le paiement.</p>
+                                <router-link v-if="orderId" :to="`/commande/${orderId}`">
+                                    <BaseButton variant="accent" size="sm">
+                                        Retour à ma commande
+                                    </BaseButton>
+                                </router-link>
                             </div>
                         </div>
 
-                        <div v-else-if="loading" class="flex justify-center mb-6">
-                            Chargement...
+                        <!-- Contacter -->
+                        <div class="flex gap-4 items-start bg-secondary rounded-lg p-4 border border-primary-ghost/20">
+                            <span class="flex-shrink-0 w-10 h-10 bg-info/10 rounded-full flex items-center justify-center text-xl">
+                                <svg class="w-5 h-5 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </span>
+                            <div class="flex-1">
+                                <strong class="block text-primary mb-1">Besoin d'aide ?</strong>
+                                <p class="text-sm text-primary-ghost mb-3">Si vous rencontrez des difficultés, n'hésitez pas à me contacter.</p>
+                                <a href="mailto:contact@samysbh.fr">
+                                    <BaseButton variant="secondary" size="sm">
+                                        Me contacter
+                                    </BaseButton>
+                                </a>
+                            </div>
                         </div>
+                    </div>
 
-                        <div v-else-if="error" class="mb-6 text-red-500">
-                            {{ error }}
-                        </div>
+                    <!-- Rassurance -->
+                    <BaseAlert variant="success">
+                        <strong>Bon à savoir :</strong> Aucun frais n'a été prélevé sur votre compte. Vous pouvez relancer le paiement à tout moment.
+                    </BaseAlert>
 
-                        <div class="mb-6">
-                            <h2 class="text-lg font-medium text-primary mb-2">Que faire maintenant ?</h2>
-                            <ul class="text-sm text-primary-ghost text-left space-y-2">
-                                <li v-for="recommendation in recommendations" class="flex items-center gap-2">
-                                    <CheckBadgeIcon class="w-6 text-emphasis" />
-                                    <span>{{ recommendation }}</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="space-y-3">
-                            <button v-if="orderDetails" @click="retryPayment"
-                                class="inline-block w-full bg-accent-ghost hover:bg-accent text-secondary font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition duration-150 ease-in-out"
-                                :disabled="isRetrying">
-                                <span v-if="isRetrying">
-                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-secondary inline-block"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                            stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                        </path>
-                                    </svg>
-                                    Traitement en cours...
-                                </span>
-                                <span v-else>Réessayer le paiement</span>
-                            </button>
-
-                            <router-link to="/user"
-                                class="inline-block w-full bg-secondary-ghost hover:bg-secondary text-primary font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emphasis transition duration-150 ease-in-out">
-                                Retour au tableau de bord
-                            </router-link>
-
-                            <button @click="contactSupport"
-                                class="inline-block w-full text-accent-ghost hover:text-accent text-sm font-medium">
-                                Besoin d'aide ? Contactez-nous
-                            </button>
-                        </div>
+                    <!-- Liens secondaires -->
+                    <div class="flex justify-center gap-6 pt-4 border-t border-primary-ghost/20">
+                        <router-link to="/" class="text-accent hover:underline text-sm">
+                            Retour à l'accueil
+                        </router-link>
+                        <router-link to="/services" class="text-accent hover:underline text-sm">
+                            Voir nos services
+                        </router-link>
                     </div>
                 </div>
             </div>

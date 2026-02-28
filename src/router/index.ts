@@ -70,17 +70,40 @@ const routes = [
     meta: { title: 'Validation du panier' }
   },
   {
-    path: '/payment/success',
-    name: 'PaymentSuccess',
-    component: () => import('@/views/PaymentSuccess.vue'),
-    props: (route: RouteLocationNormalized) => ({ sessionId: route.query.session_id }),
-    meta: { title: 'Paiement réussi', requiresAuth: true }
+    path: '/demande-projet',
+    name: 'project-request',
+    component: () => import('@/views/ProjectRequest.vue'),
+    meta: { title: 'Demande de devis' }
   },
   {
-    path: '/payment/cancel',
-    name: 'PaymentCancel',
+    path: '/demande-projet/:id/confirmation',
+    name: 'project-request-confirmation',
+    component: () => import('@/views/ProjectRequestConfirmation.vue'),
+    meta: { title: 'Demande confirmée' }
+  },
+  {
+    path: '/mes-commandes',
+    name: 'my-orders',
+    component: () => import('@/views/MyOrders.vue'),
+    meta: { requiresAuth: true, title: 'Mes commandes' }
+  },
+  {
+    path: '/commande/:id',
+    name: 'order-page',
+    component: () => import('@/views/OrderPage.vue'),
+    meta: { title: 'Ma commande', requiresAuth: true }
+  },
+  {
+    path: '/commande/:id/paiement-confirme',
+    name: 'payment-success',
+    component: () => import('@/views/PaymentSuccess.vue'),
+    meta: { title: 'Paiement confirmé' }
+  },
+  {
+    path: '/commande/:id/paiement-annule',
+    name: 'payment-cancel',
     component: () => import('@/views/PaymentCancel.vue'),
-    meta: { title: 'Paiement annulé', requiresAuth: true }
+    meta: { title: 'Paiement annulé' }
   },
   {
     path: '/mentions-legales',

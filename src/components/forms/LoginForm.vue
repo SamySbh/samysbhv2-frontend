@@ -5,6 +5,9 @@ import { toTypedSchema } from '@vee-validate/yup';
 import { loginSchema } from '@/schemas';
 import { useAuth } from '@/composables/useAuth';
 import { LoginCredentials } from '@/types';
+import BaseInput from '@/components/ui/BaseInput.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseAlert from '@/components/ui/BaseAlert.vue';
 
 // Créer une seule instance du composable
 const auth = useAuth();
@@ -49,43 +52,45 @@ onMounted(() => {
 <template>
     <div class="container max-w-md card m-4 space-y-4">
         <!-- Message d'erreur éventuel -->
-        <div v-if="error" class="p-4 text-sm text-secondary bg-red-500 rounded">
+        <BaseAlert v-if="error" variant="error">
             {{ error }}
-        </div>
+        </BaseAlert>
 
         <!-- Formulaire de connexion -->
         <form @submit.prevent="handleLogin" class="space-y-4">
             <!-- Champ email -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-accent">Email</label>
-                <input id="email" v-model="email" type="email" required
-                    class="w-full px-3 py-2 mt-1 border border-primary-ghost rounded"
-                    :class="{ 'border-red-500': emailError }" placeholder="votre@email.com" />
-                <p v-if="emailError" class="mt-1 text-sm text-red-600">{{ emailError }}</p>
-            </div>
+            <BaseInput
+                v-model="email"
+                type="email"
+                label="Email"
+                placeholder="votre@email.com"
+                required
+                :error="emailError"
+            />
 
             <!-- Champ mot de passe -->
-            <div>
-                <label for="password" class="block text-sm font-medium text-accent">Mot de passe</label>
-                <input id="password" v-model="password" type="password" required
-                    class="w-full px-3 py-2 mt-1 border border-primary-ghost rounded"
-                    :class="{ 'border-red-500': passwordError }" placeholder="Votre mot de passe" />
-                <p v-if="passwordError" class="mt-1 text-sm text-red-600">{{ passwordError }}</p>
-            </div>
+            <BaseInput
+                v-model="password"
+                type="password"
+                label="Mot de passe"
+                placeholder="Votre mot de passe"
+                required
+                :error="passwordError"
+            />
 
             <!-- Bouton de connexion -->
             <div>
-                <button type="submit" class="w-full btn-primary" :disabled="loading">
-                    <span v-if="loading">Connexion en cours...</span>
-                    <span v-else>Se connecter</span>
-                </button>
+                <BaseButton type="submit" variant="primary" full-width :loading="loading">
+                    <template #loading>Connexion en cours...</template>
+                    Se connecter
+                </BaseButton>
             </div>
 
             <!-- Lien vers la page d'inscription -->
             <div class="text-center text-sm">
                 <p>
                     Pas encore de compte ?
-                    <router-link to="/register" class="font-medium text-accent hover:text-emphasis">
+                    <router-link to="/register" class="font-medium text-accent hover:text-emphasis transition-colors">
                         S'inscrire
                     </router-link>
                 </p>

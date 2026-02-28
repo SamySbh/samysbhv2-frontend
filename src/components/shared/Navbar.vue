@@ -94,6 +94,8 @@ onBeforeUnmount(() => {
           <RouterLink to="/contact" class="text-secondary hover:text-primary">Contact</RouterLink>
           <RouterLink v-if="authStore.currentUser?.role === 'ADMIN'" to="/admin"
             class="text-secondary hover:text-primary">Admin</RouterLink>
+          <RouterLink v-if="authStore.isAuthenticated && authStore.currentUser?.role !== 'ADMIN'" to="/mes-commandes"
+            class="text-secondary hover:text-primary">Mes commandes</RouterLink>
         </div>
 
         <div class="absolute left-1/2 transform -translate-x-1/2 h-full flex items-center">
@@ -139,6 +141,10 @@ onBeforeUnmount(() => {
         <RouterLink v-if="authStore.currentUser?.role === 'ADMIN'" to="/admin"
           class="block px-3 py-2 text-secondary hover:text-primary" @click="isMobileMenuOpen = false">
           Administration
+        </RouterLink>
+        <RouterLink v-if="authStore.isAuthenticated && authStore.currentUser?.role !== 'ADMIN'" to="/mes-commandes"
+          class="block px-3 py-2 text-secondary hover:text-primary" @click="isMobileMenuOpen = false">
+          Mes commandes
         </RouterLink>
         <RouterLink v-if="authStore.isAuthenticated && authStore.currentUser?.role !== 'ADMIN'" to="/user"
           class="block px-3 py-2 text-secondary hover:text-primary" @click="isMobileMenuOpen = false">

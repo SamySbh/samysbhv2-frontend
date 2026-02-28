@@ -4,6 +4,7 @@
   import ValidateCartButton from '@/components/cart/ValidateCartButton.vue';
 
   const cartStore = useCartStore();
+  const emit = defineEmits(['close']);
 
   const incrementQuantity = (serviceId: string) => {
     const item = cartStore.cartItems.find(item => item.serviceId === serviceId);
@@ -57,7 +58,7 @@
               </div>
 
               <!-- Bouton supprimer -->
-              <button @click="removeItem(item.serviceId)" class="text-red-500">
+              <button @click="removeItem(item.serviceId)" class="text-error hover:text-error/80">
                 <XCircleIcon class="size-5" />
               </button>
             </div>
@@ -71,8 +72,11 @@
             <span class="font-semibold">{{ cartStore.cartTotal.toFixed(2) }} €</span>
           </div>
 
-          <div class="flex justify-center">
-            <ValidateCartButton buttonText="Valider ma commande" />
+          <div class="flex flex-col items-center gap-2">
+            <ValidateCartButton buttonText="Demander un devis" @close="emit('close')" />
+            <p class="text-xs text-center text-primary-ghost">
+              Recevez un devis sous 24-48h
+            </p>
           </div>
         </div>
       </div>

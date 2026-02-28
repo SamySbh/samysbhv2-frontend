@@ -6,6 +6,8 @@ import UserList from '@/components/admin/users/UserList.vue';
 import OrderList from '@/components/admin/orders/OrderList.vue';
 import OrderItemList from '@/components/admin/order-items/OrderItemList.vue';
 import ServiceList from '@/components/admin/services/ServiceList.vue';
+import ProjectRequestList from '@/components/admin/project-requests/ProjectRequestList.vue';
+import OrdersAdmin from '@/components/admin/orders/OrdersAdmin.vue';
 
 // État pour le menu mobile
 const isMobileMenuOpen = ref(false);
@@ -21,7 +23,7 @@ const closeMobileMenu = () => {
 };
 
 // La section active du dashboard
-const activeSection = ref<'users' | 'orders' | 'orderItems' | 'services'>('users');
+const activeSection = ref<'users' | 'orders' | 'ordersAdmin' | 'orderItems' | 'services' | 'projectRequests'>('users');
 
 // Méthode pour changer de section
 const changeSection = (section: typeof activeSection.value) => {
@@ -66,6 +68,14 @@ const changeSection = (section: typeof activeSection.value) => {
 
                     <div v-else-if="activeSection === 'services'">
                         <ServiceList />
+                    </div>
+
+                    <div v-else-if="activeSection === 'ordersAdmin'">
+                        <OrdersAdmin />
+                    </div>
+
+                    <div v-else-if="activeSection === 'projectRequests'">
+                        <ProjectRequestList />
                     </div>
                 </div>
             </div>

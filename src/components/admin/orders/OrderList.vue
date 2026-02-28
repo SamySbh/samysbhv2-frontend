@@ -6,67 +6,16 @@ import { Order } from '@/types/order';
 import OrderCreate from './OrderCreate.vue';
 import OrderEdit from './OrderEdit.vue';
 import OrderDetails from './OrderDetails.vue';
-
-// Fonction utilitaire pour le formatage de la date
-const formatDate = (dateString?: Date | string): string => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
-
-// Fonction pour générer une référence de commande
-const getOrderReference = (order: Order): string => {
-    if (!order.id) return 'N/A';
-    // Utiliser les 6 premiers caractères de l'ID
-    const shortId = order.id.substring(0, 6).toUpperCase();
-    const date = order.createdAt ? new Date(order.createdAt) : new Date();
-    const year = date.getFullYear().toString().slice(-2);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    return `CMD-${year}${month}-${shortId}`;
-};
-
-// Fonctions pour obtenir les labels et classes des statuts
-const getMainStatusLabel = (status: string): string => {
-    const statusMap: Record<string, string> = {
-        NEW: 'Nouveau',
-        VALIDATED: 'Validé',
-        IN_PROGRESS: 'En cours',
-        COMPLETED: 'Terminé',
-        ARCHIVED: 'Archivé'
-    };
-    return statusMap[status] || status;
-};
-
-const getPaymentStatusLabel = (status: string): string => {
-    const statusMap: Record<string, string> = {
-        PENDING_DEPOSIT: 'En attente d\'acompte',
-        DEPOSIT_PAID: 'Acompte payé',
-        PENDING_FINAL: 'En attente du solde',
-        FULLY_PAID: 'Entièrement payé'
-    };
-    return statusMap[status] || status;
-};
-
-const getMainStatusClasses = (status: string): string => {
-    const classMap: Record<string, string> = {
-        NEW: 'bg-blue-100 text-blue-800',
-        VALIDATED: 'bg-purple-100 text-purple-800',
-        IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-        COMPLETED: 'bg-green-100 text-green-800',
-        ARCHIVED: 'bg-gray-100 text-gray-800'
-    };
-    return `px-2 py-1 text-xs rounded-full ${classMap[status] || 'bg-gray-100 text-gray-800'}`;
-};
-
-const getPaymentStatusClasses = (status: string): string => {
-    const classMap: Record<string, string> = {
-        PENDING_DEPOSIT: 'bg-red-100 text-red-800',
-        DEPOSIT_PAID: 'bg-yellow-100 text-yellow-800',
-        PENDING_FINAL: 'bg-blue-100 text-blue-800',
-        FULLY_PAID: 'bg-green-100 text-green-800'
-    };
-    return `px-2 py-1 text-xs rounded-full ${classMap[status] || 'bg-gray-100 text-gray-800'}`;
-};
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseBadge from '@/components/ui/BaseBadge.vue';
+import {
+    formatDate,
+    getOrderReference,
+    getMainStatusLabel,
+    getPaymentStatusLabel,
+    getMainStatusVariant,
+    getPaymentStatusVariant,
+} from '@/utils/status.utils';
 
 // Store commande
 const orderStore = useOrderStore();
@@ -135,14 +84,14 @@ const refreshList = async () => {
     }
 };
 </script>
+
 <template>
     <div>
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-secondary">Gestion des commandes</h2>
-            <button @click="openCreateModal"
-                class="bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" @click="openCreateModal">
                 Créer une commande
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Loader -->
@@ -151,63 +100,53 @@ const refreshList = async () => {
         </div>
 
         <!-- Tableau des commandes -->
-        <div v-else-if="orders.length > 0" class="bg-secondary rounded-lg shadow overflow-hidden overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-300">
-                <thead class="bg-emphasis-ghost">
+        <div v-else-if="orders.length > 0" class="table-container overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="table-header">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Référence</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Date
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Montant</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Paiement</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-secondary uppercase tracking-wider">
-                            Actions</th>
+                        <th class="table-header-cell">Référence</th>
+                        <th class="table-header-cell">Date</th>
+                        <th class="table-header-cell">Client</th>
+                        <th class="table-header-cell">Montant</th>
+                        <th class="table-header-cell">Statut</th>
+                        <th class="table-header-cell">Paiement</th>
+                        <th class="table-header-cell text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-secondary divide-y divide-gray-300">
-                    <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium">
+                <tbody class="table-body">
+                    <tr v-for="order in orders" :key="order.id" class="table-row">
+                        <td class="table-cell font-medium">
                             {{ getOrderReference(order) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ formatDate(order.createdAt) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ order.user?.firstName }} {{ order.user?.lastName }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ order.totalAmount.toFixed(2) }} €
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span :class="getMainStatusClasses(order.statusMain)">
+                        <td class="table-cell">
+                            <BaseBadge :variant="getMainStatusVariant(order.statusMain)">
                                 {{ getMainStatusLabel(order.statusMain) }}
-                            </span>
+                            </BaseBadge>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span :class="getPaymentStatusClasses(order.statusPayment)">
+                        <td class="table-cell">
+                            <BaseBadge :variant="getPaymentStatusVariant(order.statusPayment)">
                                 {{ getPaymentStatusLabel(order.statusPayment) }}
-                            </span>
+                            </BaseBadge>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                            <button @click="openDetailsModal(order)"
-                                class="bg-gray-300 text-primary-ghost px-3 py-1 rounded hover:bg-gray-300">
+                        <td class="table-cell text-right space-x-2">
+                            <BaseButton variant="ghost" size="sm" @click="openDetailsModal(order)">
                                 Détails
-                            </button>
-                            <button @click="openEditModal(order)"
-                                class="bg-accent text-secondary px-3 py-1 rounded hover:bg-accent">
+                            </BaseButton>
+                            <BaseButton variant="accent" size="sm" @click="openEditModal(order)">
                                 Modifier
-                            </button>
-                            <button @click="deleteOrder(order.id as string)"
-                                class="bg-red-500 text-secondary px-3 py-1 rounded hover:bg-red-600">
+                            </BaseButton>
+                            <BaseButton variant="danger" size="sm" @click="deleteOrder(order.id as string)">
                                 Supprimer
-                            </button>
+                            </BaseButton>
                         </td>
                     </tr>
                 </tbody>
@@ -215,12 +154,11 @@ const refreshList = async () => {
         </div>
 
         <!-- Message si aucune commande -->
-        <div v-else-if="!loading" class="text-center py-8 bg-gray-50 rounded-lg">
+        <div v-else-if="!loading" class="text-center py-8 bg-secondary-ghost rounded-lg">
             <p class="text-primary">Aucune commande disponible.</p>
-            <button @click="openCreateModal"
-                class="mt-4 bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" class="mt-4" @click="openCreateModal">
                 Créer une première commande
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Modal de création -->

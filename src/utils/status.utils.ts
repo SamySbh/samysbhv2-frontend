@@ -3,6 +3,7 @@ import { Order } from '../types/order';
 // Types pour les statuts
 export type OrderMainStatus = 'NEW' | 'VALIDATED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED';
 export type OrderPaymentStatus = 'PENDING_DEPOSIT' | 'DEPOSIT_PAID' | 'PENDING_FINAL' | 'FULLY_PAID';
+export type BadgeVariant = 'info' | 'emphasis' | 'warning' | 'success' | 'error';
 
 // Libellés pour les statuts principaux
 export const mainStatusLabels: Record<OrderMainStatus, string> = {
@@ -31,31 +32,52 @@ export const getPaymentStatusLabel = (status: OrderPaymentStatus): string => {
     return paymentStatusLabels[status] || status;
 };
 
-// Classes CSS pour le statut principal
-export const getMainStatusClasses = (status: OrderMainStatus) => {
-    return [
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-        {
-            'bg-cyan-100 text-cyan-800': status === 'NEW',
-            'bg-green-100 text-green-800': status === 'VALIDATED',
-            'bg-yellow-100 text-yellow-800': status === 'IN_PROGRESS',
-            'bg-blue-100 text-blue-800': status === 'COMPLETED',
-            'bg-gray-100 text-gray-800': status === 'ARCHIVED'
-        }
-    ];
+// Obtenir la variante de badge pour le statut principal
+export const getMainStatusVariant = (status: OrderMainStatus): BadgeVariant => {
+    const variants: Record<OrderMainStatus, BadgeVariant> = {
+        'NEW': 'info',
+        'VALIDATED': 'emphasis',
+        'IN_PROGRESS': 'warning',
+        'COMPLETED': 'success',
+        'ARCHIVED': 'info'
+    };
+    return variants[status] || 'info';
 };
 
-// Classes CSS pour le statut de paiement
+// Obtenir la variante de badge pour le statut de paiement
+export const getPaymentStatusVariant = (status: OrderPaymentStatus): BadgeVariant => {
+    const variants: Record<OrderPaymentStatus, BadgeVariant> = {
+        'PENDING_DEPOSIT': 'error',
+        'DEPOSIT_PAID': 'warning',
+        'PENDING_FINAL': 'info',
+        'FULLY_PAID': 'success'
+    };
+    return variants[status] || 'info';
+};
+
+// Classes CSS pour le statut principal (conservé pour compatibilité)
+export const getMainStatusClasses = (status: OrderMainStatus) => {
+    const baseClasses = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
+    const variantClasses: Record<OrderMainStatus, string> = {
+        'NEW': 'bg-info-light text-info',
+        'VALIDATED': 'bg-emphasis/20 text-emphasis',
+        'IN_PROGRESS': 'bg-warning-light text-warning',
+        'COMPLETED': 'bg-success-light text-success',
+        'ARCHIVED': 'bg-info-light text-info'
+    };
+    return `${baseClasses} ${variantClasses[status] || variantClasses['NEW']}`;
+};
+
+// Classes CSS pour le statut de paiement (conservé pour compatibilité)
 export const getPaymentStatusClasses = (status: OrderPaymentStatus) => {
-    return [
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-        {
-            'bg-red-100 text-red-800': status === 'PENDING_DEPOSIT',
-            'bg-orange-100 text-orange-800': status === 'DEPOSIT_PAID',
-            'bg-amber-100 text-amber-800': status === 'PENDING_FINAL',
-            'bg-emerald-100 text-emerald-800': status === 'FULLY_PAID'
-        }
-    ];
+    const baseClasses = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
+    const variantClasses: Record<OrderPaymentStatus, string> = {
+        'PENDING_DEPOSIT': 'bg-error-light text-error',
+        'DEPOSIT_PAID': 'bg-warning-light text-warning',
+        'PENDING_FINAL': 'bg-info-light text-info',
+        'FULLY_PAID': 'bg-success-light text-success'
+    };
+    return `${baseClasses} ${variantClasses[status] || variantClasses['PENDING_DEPOSIT']}`;
 };
 
 // Formatter la date avec gestion des undefined

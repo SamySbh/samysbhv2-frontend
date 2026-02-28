@@ -15,6 +15,15 @@ export default {
         'accent-ghost': 'rgba(71, 110, 246, 0.8)', // Bleu cobalt vif 0.8
         emphasis: '#865DFF',      //Violet électrique
         'emphasis-ghost': 'rgba(134, 93, 255, 0.8)', // Violet électrique 0.8
+        // Couleurs sémantiques pour les états
+        success: '#22c55e',       // Vert pour succès/actif
+        'success-light': '#dcfce7', // Vert clair pour badges
+        warning: '#f59e0b',       // Orange pour avertissement
+        'warning-light': '#fef3c7', // Orange clair pour badges
+        error: '#ef4444',         // Rouge pour erreur/danger
+        'error-light': '#fee2e2', // Rouge clair pour badges
+        info: '#3b82f6',          // Bleu pour info
+        'info-light': '#dbeafe',  // Bleu clair pour badges
       },
       fontFamily: {
         geologica: ['Geologica', 'serif'],

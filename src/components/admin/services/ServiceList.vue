@@ -6,6 +6,8 @@ import { Service } from '@/types/service';
 import ServiceCreate from './ServiceCreate.vue';
 import ServiceEdit from './ServiceEdit.vue';
 import ServiceDetails from './ServiceDetails.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseBadge from '@/components/ui/BaseBadge.vue';
 
 // Store service
 const serviceStore = useServiceStore();
@@ -106,10 +108,9 @@ const refreshList = async () => {
     <div>
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-secondary">Gestion des services</h2>
-            <button @click="openCreateModal"
-                class="bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" @click="openCreateModal">
                 Ajouter un service
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Loader -->
@@ -120,44 +121,39 @@ const refreshList = async () => {
         <!-- Affichage en grille des services -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-for="service in services" :key="service.id"
-                class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow">
-                <div class="aspect-w-16 aspect-h-9 bg-gray-100">
+                class="card-admin hover:shadow-md transition-shadow">
+                <div class="aspect-w-16 aspect-h-9 bg-primary-ghost/10">
                     <img :src="getImageUrl(service.image)" :alt="service.name" class="object-cover w-full h-48"
                         @error="($event.target as HTMLImageElement).src = ''" />
                 </div>
 
                 <div class="p-4">
                     <div class="flex justify-between items-start">
-                        <h3 class="text-lg font-semibold mb-2">{{ service.name }}</h3>
-                        <span :class="[
-                            'px-2 py-1 text-xs rounded-full',
-                            service.isActive ? 'bg-green-500 text-secondary' : 'bg-red-500 text-secondary'
-                        ]">
+                        <h3 class="text-lg font-semibold mb-2 text-primary">{{ service.name }}</h3>
+                        <BaseBadge :variant="service.isActive ? 'success' : 'error'">
                             {{ service.isActive ? 'Actif' : 'Inactif' }}
-                        </span>
+                        </BaseBadge>
                     </div>
 
-                    <p class="text-gray-600 mb-2 line-clamp-2">{{ service.description }}</p>
+                    <p class="text-primary-ghost mb-2 line-clamp-2">{{ service.description }}</p>
 
                     <div class="flex justify-between items-center mt-4">
-                        <span class="font-semibold text-secondary">{{ service.basePrice.toFixed(2) }} €</span>
+                        <span class="font-semibold text-accent">{{ service.basePrice.toFixed(2) }} €</span>
                         <span class="text-xs text-emphasis">{{ service.type }}</span>
                     </div>
 
-                    <div class="flex justify-between mt-4 pt-3 border-t border-gray-100">
-                        <button @click="openDetailsModal(service)" class="text-blue-500 hover:text-blue-700">
+                    <div class="flex justify-between mt-4 pt-3 border-t border-primary-ghost/20">
+                        <BaseButton variant="ghost" size="sm" @click="openDetailsModal(service)">
                             Détails
-                        </button>
+                        </BaseButton>
 
                         <div class="space-x-2">
-                            <button @click="openEditModal(service)"
-                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            <BaseButton variant="accent" size="sm" @click="openEditModal(service)">
                                 Modifier
-                            </button>
-                            <button @click="deleteService(service.id as string)"
-                                class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                            </BaseButton>
+                            <BaseButton variant="danger" size="sm" @click="deleteService(service.id as string)">
                                 Supprimer
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
                 </div>
@@ -165,12 +161,11 @@ const refreshList = async () => {
         </div>
 
         <!-- Message si aucun service -->
-        <div v-if="!loading && services.length === 0" class="text-center py-8 bg-gray-50 rounded-lg">
+        <div v-if="!loading && services.length === 0" class="text-center py-8 bg-secondary-ghost rounded-lg">
             <p class="text-emphasis">Aucun service disponible.</p>
-            <button @click="openCreateModal"
-                class="mt-4 bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" class="mt-4" @click="openCreateModal">
                 Ajouter un premier service
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Modal de création -->

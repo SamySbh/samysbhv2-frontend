@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useOrderItemStore } from '@/stores/order-items.store';
 import { useOrderStore } from '@/stores/order.store';
 import { useServiceStore } from '@/stores/service.store';
 import { storeToRefs } from 'pinia';
+import BaseModal from '@/components/ui/BaseModal.vue';
+import BaseSelect from '@/components/ui/BaseSelect.vue';
+import BaseInput from '@/components/ui/BaseInput.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseAlert from '@/components/ui/BaseAlert.vue';
 
 // Props
 const props = defineProps<{
@@ -85,6 +90,21 @@ const getOrderReference = (orderId: string): string => {
     return `CMD-${year}${month}-${shortId}`;
 };
 
+// Options pour les selects
+const orderOptions = computed(() =>
+    orders.value.map(order => ({
+        value: order.id as string,
+        label: `${getOrderReference(order.id as string)} - ${order.user?.firstName} ${order.user?.lastName}`
+    }))
+);
+
+const serviceOptions = computed(() =>
+    services.value.map(service => ({
+        value: service.id as string,
+        label: `${service.name} - ${service.basePrice.toFixed(2)} €`
+    }))
+);
+
 // Soumettre le formulaire
 const submitForm = async () => {
     isSubmitting.value = true;
@@ -107,87 +127,74 @@ const closeModal = () => {
 </script>
 
 <template>
-    <!-- Fond semi-transparent -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
-        <!-- Modal -->
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 my-8">
-            <!-- En-tête du modal -->
-            <div class="px-6 py-4 border-b border-emphasis">
-                <h3 class="text-lg font-semibold text-primary">Ajouter un item à la commande</h3>
-            </div>
+    <BaseModal title="Ajouter un item à la commande" @close="closeModal">
+        <form @submit.prevent="submitForm" class="space-y-4">
+            <!-- Message d'erreur -->
+            <BaseAlert v-if="errorMessage" variant="error" dismissible @dismiss="errorMessage = ''">
+                {{ errorMessage }}
+            </BaseAlert>
 
-            <!-- Corps du modal -->
-            <div class="px-6 py-4 max-h-[70vh] overflow-y-auto">
-                <form @submit.prevent="submitForm">
-                    <!-- Message d'erreur -->
-                    <div v-if="errorMessage" class="mb-4 p-3 bg-red-500 text-secondary rounded">
-                        {{ errorMessage }}
-                    </div>
+            <!-- Commande (orderId) -->
+            <BaseSelect
+                v-model="formData.orderId"
+                :options="orderOptions"
+                label="Commande"
+                placeholder="Sélectionner une commande"
+                required
+                light-mode
+            />
 
-                    <!-- Commande (orderId) -->
-                    <div class="mb-4">
-                        <label for="orderId" class="block text-sm font-medium text-secondary-ghost mb-1">Commande</label>
-                        <select id="orderId" v-model="formData.orderId" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent">
-                            <option value="" disabled>Sélectionner une commande</option>
-                            <option v-for="order in orders" :key="order.id" :value="order.id">
-                                {{ getOrderReference(order.id as string) }} - {{ order.user?.firstName }} {{
-                                order.user?.lastName }}
-                            </option>
-                        </select>
-                    </div>
+            <!-- Service (serviceId) -->
+            <BaseSelect
+                v-model="formData.serviceId"
+                :options="serviceOptions"
+                label="Service"
+                placeholder="Sélectionner un service"
+                required
+                light-mode
+            />
 
-                    <!-- Service (serviceId) -->
-                    <div class="mb-4">
-                        <label for="serviceId" class="block text-sm font-medium text-secondary-ghost mb-1">Service</label>
-                        <select id="serviceId" v-model="formData.serviceId" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent">
-                            <option value="" disabled>Sélectionner un service</option>
-                            <option v-for="service in services" :key="service.id" :value="service.id">
-                                {{ service.name }} - {{ service.basePrice.toFixed(2) }} €
-                            </option>
-                        </select>
-                    </div>
+            <!-- Quantité -->
+            <BaseInput
+                v-model="formData.quantity"
+                type="number"
+                label="Quantité"
+                :min="1"
+                required
+                light-mode
+            />
 
-                    <!-- Quantité -->
-                    <div class="mb-4">
-                        <label for="quantity" class="block text-sm font-medium text-secondary-ghost mb-1">Quantité</label>
-                        <input id="quantity" v-model.number="formData.quantity" type="number" min="1" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent" />
-                    </div>
+            <!-- Prix unitaire -->
+            <BaseInput
+                v-model="formData.unitAmount"
+                type="number"
+                label="Prix unitaire (€)"
+                :min="0"
+                step="0.01"
+                hint="Ajusté automatiquement selon le service sélectionné"
+                required
+                light-mode
+            />
 
-                    <!-- Prix unitaire -->
-                    <div class="mb-4">
-                        <label for="unitAmount" class="block text-sm font-medium text-secondary-ghost mb-1">Prix unitaire
-                            (€)</label>
-                        <input id="unitAmount" v-model.number="formData.unitAmount" type="number" min="0" step="0.01"
-                            required
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent" />
-                        <p class="text-xs text-gray-500 mt-1">Ajusté automatiquement selon le service sélectionné</p>
-                    </div>
+            <!-- Montant total (calculé automatiquement) -->
+            <BaseInput
+                v-model="formData.totalAmount"
+                type="number"
+                label="Montant total (€)"
+                hint="Calculé automatiquement (quantité × prix unitaire)"
+                readonly
+                light-mode
+            />
+        </form>
 
-                    <!-- Montant total (calculé automatiquement) -->
-                    <div class="mb-4">
-                        <label for="totalAmount" class="block text-sm font-medium text-secondary-ghost mb-1">Montant total
-                            (€)</label>
-                        <input id="totalAmount" v-model.number="formData.totalAmount" type="number" readonly
-                            class="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded" />
-                        <p class="text-xs text-gray-500 mt-1">Calculé automatiquement (quantité × prix unitaire)</p>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Pied du modal -->
-            <div class="px-6 py-4 border-t border-emphasis flex justify-end space-x-2">
-                <button @click="closeModal" class="px-4 py-2 bg-gray-100 text-primary rounded hover:bg-gray-300"
-                    :disabled="isSubmitting">
-                    Annuler
-                </button>
-                <button @click="submitForm" class="px-4 py-2 bg-accent text-secondary rounded hover:bg-accent/90"
-                    :disabled="isSubmitting">
-                    {{ isSubmitting ? 'Création...' : 'Créer l\'item' }}
-                </button>
-            </div>
-        </div>
-    </div>
+        <template #footer>
+            <BaseButton variant="secondary" @click="closeModal" :disabled="isSubmitting">
+                Annuler
+            </BaseButton>
+            <BaseButton variant="accent" @click="submitForm" :loading="isSubmitting">
+                <template #loading>Création...</template>
+                Créer l'item
+            </BaseButton>
+        </template>
+    </BaseModal>
 </template>

@@ -1,41 +1,49 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import {
     getMainStatusLabel,
-    getMainStatusClasses,
+    getMainStatusVariant,
     formatDate,
     getOrderReference
 } from '@/utils/status.utils';
+import BaseBadge from '@/components/ui/BaseBadge.vue';
 
 defineProps<{
     orders: any[];
 }>();
+
+const router = useRouter();
+
+function goToOrder(orderId: string) {
+    router.push({ name: 'order-page', params: { id: orderId } });
+}
 </script>
 
 <template>
-    <div class="hidden sm:block overflow-x-auto rounded">
+    <div class="hidden sm:block table-container">
         <table class="min-w-full">
-            <thead class="bg-emphasis-ghost">
+            <thead class="table-header">
                 <tr>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                        Référence</th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Date
-                    </th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Montant
-                    </th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-secondary uppercase tracking-wider">Statut
-                    </th>
+                    <th class="table-header-cell">Référence</th>
+                    <th class="table-header-cell">Date</th>
+                    <th class="table-header-cell">Montant</th>
+                    <th class="table-header-cell">Statut</th>
                 </tr>
             </thead>
-            <tbody class="bg-secondary-ghost divide-y divide-primary">
-                <tr v-for="order in orders.slice(0, 5)" :key="order.id || Math.random()"
-                    class="hover:bg-secondary-ghost">
-                    <td class="py-3 px-4 whitespace-nowrap">{{ getOrderReference(order) }}</td>
-                    <td class="py-3 px-4 whitespace-nowrap">{{ formatDate(order.createdAt) }}</td>
-                    <td class="py-3 px-4 whitespace-nowrap">{{ order.totalAmount.toFixed(2) }} €</td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                        <span :class="getMainStatusClasses(order.statusMain)">
+            <tbody class="table-body">
+                <tr
+                    v-for="order in orders.slice(0, 5)"
+                    :key="order.id || Math.random()"
+                    class="table-row cursor-pointer hover:bg-emphasis/10 transition-colors"
+                    @click="goToOrder(order.id)"
+                >
+                    <td class="table-cell text-accent underline">{{ getOrderReference(order) }}</td>
+                    <td class="table-cell">{{ formatDate(order.createdAt) }}</td>
+                    <td class="table-cell">{{ order.totalAmount.toFixed(2) }} €</td>
+                    <td class="table-cell">
+                        <BaseBadge :variant="getMainStatusVariant(order.statusMain)">
                             {{ getMainStatusLabel(order.statusMain) }}
-                        </span>
+                        </BaseBadge>
                     </td>
                 </tr>
             </tbody>

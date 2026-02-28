@@ -16,7 +16,7 @@ export const useOrderStore = defineStore('order', () => {
         error.value = null
 
         try {
-            const response = await fetch(`${apiUrl}/orders`, {
+            const response = await fetch(`${apiUrl}/orders/my-orders`, {
                 headers: getAuthHeaders()
             })
 

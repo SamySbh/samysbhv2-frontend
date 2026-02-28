@@ -5,6 +5,8 @@ import { useCartStore } from '../stores/cart.store';
 import { useAuthStore } from '../stores/auth.store';
 import { useOrderStore } from '../stores/order.store';
 import { getDefaultUser } from '../types/user';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseAlert from '@/components/ui/BaseAlert.vue';
 
 // Stores et router
 const cartStore = useCartStore();
@@ -12,13 +14,20 @@ const authStore = useAuthStore();
 const orderStore = useOrderStore();
 const router = useRouter();
 
+// Navigation vers la demande de projet
+function goToProjectRequest() {
+    if (cartStore.cartItems.length === 0) {
+        return;
+    }
+    router.push('/demande-projet');
+}
+
 // États
 const isSubmitting = ref(false);
 
 // Computed
 const cartItems = computed(() => cartStore.cartItems);
 const cartTotal = computed(() => cartStore.cartTotal);
-//const depositAmount = computed(() => cartTotal.value * 0.3); // 30% d'acompte
 const isCartEmpty = computed(() => cartItems.value.length === 0);
 
 const user = computed(() => authStore.currentUser || getDefaultUser());
@@ -33,7 +42,6 @@ const formatPrice = (price: number) => {
 
 // Vérification de l'authentification
 onMounted(async () => {
-    // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
     if (!authStore.isAuthenticated) {
         router.push({
             name: 'Login',
@@ -51,31 +59,22 @@ const processOrder = async () => {
     isSubmitting.value = true;
 
     try {
-        // Vérifier si l'utilisateur a un ID
         if (!user.value.id) {
             throw new Error("Identifiant utilisateur manquant");
         }
 
-        // Préparation des données de commande
         const orderData = cartStore.prepareOrderData(user.value.id);
 
-        console.log("Données de commande préparées:", orderData); // Ajout d'un log pour debug
-
-        // Créer la commande avec ses articles
         const createdOrder = await orderStore.createOrderWithItems({
             statusMain: orderData.statusMain,
             statusPayment: orderData.statusPayment,
             totalAmount: orderData.totalAmount,
             depositAmount: orderData.depositAmount,
             userId: orderData.userId,
-            orderItems: orderData.orderItems // Inclure les articles de commande
+            orderItems: orderData.orderItems
         });
 
-        console.log("Commande créée:", createdOrder); // Ajout d'un log pour debug
-
-        // Rediriger vers la page de paiement Stripe
         if (createdOrder && typeof createdOrder === 'object') {
-            // Récupérer l'ID de la commande, qui pourrait être dans createdOrder.order.id
             const orderId = createdOrder.id || (createdOrder.order && createdOrder.order.id);
 
             if (!orderId) {
@@ -84,17 +83,14 @@ const processOrder = async () => {
 
             const sessionUrl = await orderStore.createCheckoutSession(orderId);
 
-            // Vider le panier après création de la commande
             cartStore.clearCart();
 
-            // Redirection vers la page de paiement Stripe
             window.location.href = sessionUrl;
         } else {
             throw new Error("Format de réponse invalide pour la création de commande");
         }
     } catch (error) {
         console.error('Erreur lors de la création de la commande:', error);
-        // Vous pourriez ajouter un message d'erreur visible pour l'utilisateur ici
     } finally {
         isSubmitting.value = false;
     }
@@ -103,33 +99,33 @@ const processOrder = async () => {
 
 <template>
     <div class="container mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold mb-6">Validation de commande</h1>
+        <h1 class="text-2xl font-bold mb-6 text-primary">Validation de commande</h1>
 
         <!-- Alerte si le panier est vide -->
-        <div v-if="isCartEmpty" class="bg-secondary-ghost border-x-4 border-emphasis text-primary p-4 mb-6">
+        <BaseAlert v-if="isCartEmpty" variant="warning" class="mb-6">
             <p>Votre panier est vide. Veuillez ajouter des services avant de procéder au paiement.</p>
-            <button @click="router.push('/')" class="mt-2 text-accent hover:underline">
+            <BaseButton variant="ghost" class="mt-2" @click="router.push('/')">
                 Retour aux services
-            </button>
-        </div>
+            </BaseButton>
+        </BaseAlert>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Résumé du panier (2/3 colonnes) -->
             <div class="md:col-span-2">
                 <div class="bg-secondary-ghost rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Résumé de votre panier</h2>
+                    <h2 class="text-xl font-semibold mb-4 text-primary">Résumé de votre panier</h2>
 
                     <div class="divide-y divide-emphasis">
                         <!-- Liste des articles -->
                         <div v-for="item in cartItems" :key="item.serviceId" class="py-4">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h3 class="font-medium">{{ item.service.name }}</h3>
+                                    <h3 class="font-medium text-primary">{{ item.service.name }}</h3>
                                     <p class="text-sm text-primary-ghost">{{ item.service.description }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p>{{ item.quantity }} × {{ formatPrice(item.unitAmount) }}</p>
-                                    <p class="font-semibold">{{ formatPrice(item.totalAmount) }}</p>
+                                    <p class="text-primary">{{ item.quantity }} × {{ formatPrice(item.unitAmount) }}</p>
+                                    <p class="font-semibold text-primary">{{ formatPrice(item.totalAmount) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -138,13 +134,9 @@ const processOrder = async () => {
                     <!-- Total -->
                     <div class="mt-6 pt-4 border-t border-emphasis">
                         <div class="flex justify-between items-center">
-                            <span class="font-semibold">Total</span>
-                            <span class="text-xl font-bold">{{ formatPrice(cartTotal) }}</span>
+                            <span class="font-semibold text-primary">Total</span>
+                            <span class="text-xl font-bold text-accent">{{ formatPrice(cartTotal) }}</span>
                         </div>
-                        <!--<div class="flex justify-between items-center text-sm text-primary-ghost mt-2">
-                            <span>Acompte (30%)</span>
-                            <span>{{ formatPrice(depositAmount) }}</span>
-                        </div>-->
                     </div>
                 </div>
             </div>
@@ -152,32 +144,44 @@ const processOrder = async () => {
             <!-- Informations de paiement (1/3 colonne) -->
             <div class="md:col-span-1">
                 <div class="bg-secondary-ghost rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Procéder au paiement</h2>
+                    <h2 class="text-xl font-semibold mb-4 text-primary">Procéder au paiement</h2>
 
                     <!-- Résumé utilisateur -->
                     <div class="mb-6 space-y-1">
                         <h3 class="font-medium mb-2 text-accent">Vos informations</h3>
-                        <p>{{ user.firstName }} {{ user.lastName }}</p>
-                        <p>{{ user.email }}</p>
-                        <p v-if="user.company">{{ user.company }}</p>
+                        <p class="text-primary">{{ user.firstName }} {{ user.lastName }}</p>
+                        <p class="text-primary">{{ user.email }}</p>
+                        <p v-if="user.company" class="text-primary">{{ user.company }}</p>
                     </div>
 
-                    <!-- Bouton de paiement -->
-                    <button @click="processOrder" :disabled="isSubmitting"
-                        class="w-full px-4 py-3 bg-accent-ghost text-secondary font-medium rounded-md hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                        <div v-if="isSubmitting" class="flex items-center justify-center">
-                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-secondary"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
-                            </svg>
-                            Traitement...
-                        </div>
-                        <span v-else>Payer ({{ formatPrice(cartTotal) }})</span>
-                    </button>
+                    <!-- Bouton demande de devis -->
+                    <BaseButton
+                        variant="accent"
+                        full-width
+                        @click="goToProjectRequest"
+                        class="mb-3"
+                    >
+                        Demander un devis personnalisé
+                    </BaseButton>
+
+                    <p class="text-sm text-primary-ghost text-center mb-4">
+                        Recevez un devis sur-mesure sous 24-48h
+                    </p>
+
+                    <div class="border-t border-emphasis pt-4 mt-4">
+                        <p class="text-sm text-primary-ghost text-center mb-3">Ou payez directement</p>
+
+                        <!-- Bouton de paiement -->
+                        <BaseButton
+                            variant="primary"
+                            full-width
+                            :loading="isSubmitting"
+                            @click="processOrder"
+                        >
+                            <template #loading>Traitement...</template>
+                            Payer ({{ formatPrice(cartTotal) }})
+                        </BaseButton>
+                    </div>
                 </div>
             </div>
         </div>

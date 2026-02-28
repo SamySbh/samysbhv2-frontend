@@ -5,6 +5,8 @@ import { storeToRefs } from 'pinia';
 import { User } from '@/types/user';
 import UserCreate from './UserCreate.vue';
 import UserEdit from './UserEdit.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseBadge from '@/components/ui/BaseBadge.vue';
 
 // Store utilisateur
 const userStore = useUserStore();
@@ -70,10 +72,9 @@ const refreshList = async () => {
     <div>
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-secondary">Gestion des utilisateurs</h2>
-            <button @click="openCreateModal"
-                class="bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" @click="openCreateModal">
                 Ajouter un utilisateur
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Loader -->
@@ -82,52 +83,40 @@ const refreshList = async () => {
         </div>
 
         <!-- Tableau des utilisateurs -->
-        <div v-else class="bg-white rounded-lg shadow overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-300">
-                <thead class="bg-emphasis-ghost">
+        <div v-else class="table-container">
+            <table class="min-w-full">
+                <thead class="table-header">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Nom
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Email
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Rôle
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Téléphone</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-secondary uppercase tracking-wider">
-                            Actions</th>
+                        <th class="table-header-cell">Nom</th>
+                        <th class="table-header-cell">Email</th>
+                        <th class="table-header-cell">Rôle</th>
+                        <th class="table-header-cell">Téléphone</th>
+                        <th class="table-header-cell text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-300">
-                    <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                <tbody class="table-body">
+                    <tr v-for="user in users" :key="user.id" class="table-row">
+                        <td class="table-cell">
                             {{ user.firstName }} {{ user.lastName }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ user.email }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span :class="[
-                                'px-2 py-1 text-xs rounded-full',
-                                user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                    user.role === 'USER' ? 'bg-green-100 text-green-800' :
-                                        'bg-red-100 text-red-800'
-                            ]">
+                        <td class="table-cell">
+                            <BaseBadge :variant="user.role === 'ADMIN' ? 'emphasis' : user.role === 'USER' ? 'success' : 'error'">
                                 {{ user.role }}
-                            </span>
+                            </BaseBadge>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ user.phone || 'Non renseigné' }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                            <button @click="openEditModal(user)"
-                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                        <td class="table-cell text-right space-x-2">
+                            <BaseButton variant="accent" size="sm" @click="openEditModal(user)">
                                 Modifier
-                            </button>
-                            <button @click="deleteUser(user.id as string)"
-                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                            </BaseButton>
+                            <BaseButton variant="danger" size="sm" @click="deleteUser(user.id as string)">
                                 Supprimer
-                            </button>
+                            </BaseButton>
                         </td>
                     </tr>
                 </tbody>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useOrderItemStore } from '@/stores/order-items.store';
 import { useOrderStore } from '@/stores/order.store';
 import { useServiceStore } from '@/stores/service.store';
@@ -7,6 +7,8 @@ import { storeToRefs } from 'pinia';
 import { OrderItem } from '@/types';
 import OrderItemCreate from './OrderItemCreate.vue';
 import OrderItemEdit from './OrderItemEdit.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseSelect from '@/components/ui/BaseSelect.vue';
 
 // Stores
 const orderItemStore = useOrderItemStore();
@@ -24,12 +26,20 @@ const showEditModal = ref(false);
 const selectedOrderItem = ref<OrderItem | null>(null);
 
 // Filtres
-const selectedOrderId = ref<string | null>(null);
+const selectedOrderId = ref<string>('');
+
+// Options pour le filtre
+const orderFilterOptions = computed(() => [
+    { value: '', label: 'Toutes les commandes' },
+    ...orders.value.map(order => ({
+        value: order.id as string,
+        label: `${getOrderReference(order.id as string)} - ${order.totalAmount.toFixed(2)} €`
+    }))
+]);
 
 // Chargement des données
 onMounted(async () => {
     try {
-        // Charger les items de commande, les commandes et les services
         await Promise.all([
             orderItemStore.getOrderItems(),
             orderStore.getOrders(),
@@ -89,13 +99,9 @@ const refreshList = async () => {
 const filterByOrder = async () => {
     try {
         if (selectedOrderId.value) {
-            console.log(`Filtrage pour la commande: ${selectedOrderId.value}`);
             await orderItemStore.getOrderItemsByOrderId(selectedOrderId.value);
-            console.log(`Résultats obtenus: ${orderItems.value.length} items`);
         } else {
-            console.log('Chargement de tous les items');
             await orderItemStore.getOrderItems();
-            console.log(`Résultats obtenus: ${orderItems.value.length} items`);
         }
     } catch (error) {
         console.error('Erreur lors du filtrage des items:', error);
@@ -125,26 +131,21 @@ const getServiceName = (serviceId: string): string => {
     <div>
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-secondary">Gestion des items de commande</h2>
-            <button @click="openCreateModal"
-                class="bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" @click="openCreateModal">
                 Ajouter un item
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Filtre par commande -->
-        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <div class="mb-6 p-4 bg-secondary-ghost rounded-lg">
             <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div class="flex-grow">
-                    <label for="orderFilter" class="block text-sm font-medium text-primary-ghost mb-1">Filtrer par
-                        commande</label>
-                    <select id="orderFilter" v-model="selectedOrderId" @change="filterByOrder"
-                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent">
-                        <!-- options -->
-                        <option :value="null">Toutes les commandes</option>
-                        <option v-for="order in orders" :key="order.id" :value="order.id">
-                            {{ getOrderReference(order.id as string) }} - {{ order.totalAmount.toFixed(2) }} €
-                        </option>
-                    </select>
+                    <BaseSelect
+                        v-model="selectedOrderId"
+                        :options="orderFilterOptions"
+                        label="Filtrer par commande"
+                        @change="filterByOrder"
+                    />
                 </div>
             </div>
         </div>
@@ -155,55 +156,46 @@ const getServiceName = (serviceId: string): string => {
         </div>
 
         <!-- Tableau des items de commande -->
-        <div v-else-if="orderItems.length > 0" class="bg-secondary rounded-lg shadow overflow-hidden overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-300">
-                <thead class="bg-emphasis-ghost">
+        <div v-else-if="orderItems.length > 0" class="table-container overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="table-header">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">ID
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Commande</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Service</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Quantité</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Prix
-                            unitaire</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">
-                            Montant total</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-secondary uppercase tracking-wider">
-                            Actions</th>
+                        <th class="table-header-cell">ID</th>
+                        <th class="table-header-cell">Commande</th>
+                        <th class="table-header-cell">Service</th>
+                        <th class="table-header-cell">Quantité</th>
+                        <th class="table-header-cell">Prix unitaire</th>
+                        <th class="table-header-cell">Montant total</th>
+                        <th class="table-header-cell text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-secondary divide-y divide-gray-300">
-                    <tr v-for="item in orderItems" :key="item.id" class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono">
+                <tbody class="table-body">
+                    <tr v-for="item in orderItems" :key="item.id" class="table-row">
+                        <td class="table-cell text-sm font-mono">
                             {{ item.id ? item.id.substring(0, 8) + '...' : 'N/A' }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ getOrderReference(item.orderId) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ getServiceName(item.serviceId) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <td class="table-cell text-center">
                             {{ item.quantity }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="table-cell">
                             {{ item.unitAmount.toFixed(2) }} €
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap font-medium">
+                        <td class="table-cell font-medium">
                             {{ item.totalAmount.toFixed(2) }} €
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                            <button @click="openEditModal(item)"
-                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                        <td class="table-cell text-right space-x-2">
+                            <BaseButton variant="accent" size="sm" @click="openEditModal(item)">
                                 Modifier
-                            </button>
-                            <button @click="deleteOrderItem(item.id as string)"
-                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                            </BaseButton>
+                            <BaseButton variant="danger" size="sm" @click="deleteOrderItem(item.id as string)">
                                 Supprimer
-                            </button>
+                            </BaseButton>
                         </td>
                     </tr>
                 </tbody>
@@ -211,18 +203,17 @@ const getServiceName = (serviceId: string): string => {
         </div>
 
         <!-- Message si aucun item -->
-        <div v-else-if="!loading" class="text-center py-8 bg-gray-50 rounded-lg">
-            <p class="text-gray-500">
+        <div v-else-if="!loading" class="text-center py-8 bg-secondary-ghost rounded-lg">
+            <p class="text-primary-ghost">
                 {{ selectedOrderId ? 'Aucun item trouvé pour cette commande.' : 'Aucun item de commande disponible.' }}
             </p>
-            <button @click="openCreateModal"
-                class="mt-4 bg-accent text-secondary px-4 py-2 rounded shadow hover:bg-accent/90 transition-colors">
+            <BaseButton variant="accent" class="mt-4" @click="openCreateModal">
                 Ajouter un item
-            </button>
+            </BaseButton>
         </div>
 
         <!-- Modal de création -->
-        <OrderItemCreate v-if="showCreateModal" :selected-order-id="selectedOrderId" @close="closeModals"
+        <OrderItemCreate v-if="showCreateModal" :selected-order-id="selectedOrderId || null" @close="closeModals"
             @item-created="refreshList" />
 
         <!-- Modal d'édition -->
