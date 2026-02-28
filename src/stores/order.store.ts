@@ -3,6 +3,7 @@ import { ref } from "vue"
 import { Order } from "../types"
 import { OrderItemInput } from "../types/order-item"
 import { getAuthHeaders } from "@/utils/http"
+import paymentApi from "@/api/payment.api"
 
 export const useOrderStore = defineStore('order', () => {
     const orders = ref<Order[]>([])
@@ -279,6 +280,46 @@ export const useOrderStore = defineStore('order', () => {
         }
     }
 
+    async function generateDepositPaymentLink(orderId: string) {
+        loading.value = true
+        error.value = null
+
+        try {
+            const sessionData = await paymentApi.createDepositSession(orderId)
+
+            return {
+                url: sessionData.url,
+                sessionId: sessionData.sessionId
+            }
+        } catch (err) {
+            console.error('Erreur génération lien acompte:', err)
+            error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
+
+    async function generateFinalPaymentLink(orderId: string) {
+        loading.value = true
+        error.value = null
+
+        try {
+            const sessionData = await paymentApi.createFinalSession(orderId)
+
+            return {
+                url: sessionData.url,
+                sessionId: sessionData.sessionId
+            }
+        } catch (err) {
+            console.error('Erreur génération lien solde:', err)
+            error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
+
     function resetState() {
         orders.value = []
         order.value = null
@@ -299,6 +340,8 @@ export const useOrderStore = defineStore('order', () => {
         updateOrder,
         deleteOrder,
         createCheckoutSession,
+        generateDepositPaymentLink,
+        generateFinalPaymentLink,
         resetState
     }
 })

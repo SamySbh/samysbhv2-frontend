@@ -2,12 +2,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { projectRequestApi } from '@/services/api/projectRequest.api';
+import { useOrderStore } from '@/stores/order.store';
 import type { ProjectRequest } from '@/types/projectRequest';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseBadge from '@/components/ui/BaseBadge.vue';
 import BaseAlert from '@/components/ui/BaseAlert.vue';
 import CreateOrderModal from './CreateOrderModal.vue';
 import PaymentLinkModal from './PaymentLinkModal.vue';
+
+const orderStore = useOrderStore();
 
 const requests = ref<ProjectRequest[]>([]);
 const loading = ref(true);
@@ -20,6 +23,7 @@ const showPaymentLinkModal = ref(false);
 const paymentLinkData = ref<{
     orderId: string;
     paymentUrl: string;
+    paymentType: 'deposit' | 'final';
     clientName: string;
     clientEmail: string;
     totalAmount: number;
@@ -167,6 +171,7 @@ function handleOrderCreated(orderId: string, depositPaymentUrl: string) {
         paymentLinkData.value = {
             orderId,
             paymentUrl: depositPaymentUrl,
+            paymentType: 'deposit',
             clientName: selectedRequest.value.name,
             clientEmail: selectedRequest.value.email,
             totalAmount,
@@ -184,6 +189,76 @@ function handlePaymentLinkClosed() {
 
     // Recharger les demandes
     loadRequests();
+}
+
+async function generateDepositLink(request: ProjectRequest) {
+    try {
+        if (!request.orderId) {
+            alert("Cette demande n'est pas encore liée à une commande");
+            return;
+        }
+
+        actionLoading.value = request.id;
+        const { url } = await orderStore.generateDepositPaymentLink(request.orderId);
+
+        await orderStore.getOrderById(request.orderId);
+        const order = orderStore.order;
+
+        if (!order) {
+            throw new Error('Impossible de récupérer la commande');
+        }
+
+        paymentLinkData.value = {
+            orderId: request.orderId,
+            paymentUrl: url,
+            paymentType: 'deposit',
+            clientName: request.name,
+            clientEmail: request.email,
+            totalAmount: order.totalAmount,
+            depositAmount: order.depositAmount
+        };
+        showPaymentLinkModal.value = true;
+    } catch (err) {
+        console.error('Erreur génération lien acompte:', err);
+        alert(err instanceof Error ? err.message : 'Erreur lors de la génération du lien');
+    } finally {
+        actionLoading.value = null;
+    }
+}
+
+async function generateFinalLink(request: ProjectRequest) {
+    try {
+        if (!request.orderId) {
+            alert("Cette demande n'est pas encore liée à une commande");
+            return;
+        }
+
+        actionLoading.value = request.id;
+        const { url } = await orderStore.generateFinalPaymentLink(request.orderId);
+
+        await orderStore.getOrderById(request.orderId);
+        const order = orderStore.order;
+
+        if (!order) {
+            throw new Error('Impossible de récupérer la commande');
+        }
+
+        paymentLinkData.value = {
+            orderId: request.orderId,
+            paymentUrl: url,
+            paymentType: 'final',
+            clientName: request.name,
+            clientEmail: request.email,
+            totalAmount: order.totalAmount,
+            depositAmount: order.depositAmount
+        };
+        showPaymentLinkModal.value = true;
+    } catch (err) {
+        console.error('Erreur génération lien solde:', err);
+        alert(err instanceof Error ? err.message : 'Erreur lors de la génération du lien');
+    } finally {
+        actionLoading.value = null;
+    }
 }
 
 const router = useRouter();
@@ -391,6 +466,33 @@ onMounted(() => {
                         Voir la commande
                     </BaseButton>
 
+                    <BaseButton
+                        v-if="request.orderId && !request.order?.depositPaidAt"
+                        variant="primary"
+                        size="sm"
+                        :disabled="actionLoading === request.id"
+                        @click="generateDepositLink(request)"
+                    >
+                        Générer lien acompte (30%)
+                    </BaseButton>
+
+                    <BaseButton
+                        v-if="request.orderId && request.order?.depositPaidAt && !request.order?.finalPaidAt"
+                        variant="accent"
+                        size="sm"
+                        :disabled="actionLoading === request.id"
+                        @click="generateFinalLink(request)"
+                    >
+                        Générer lien solde (70%)
+                    </BaseButton>
+
+                    <span
+                        v-if="request.order?.finalPaidAt"
+                        class="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium"
+                    >
+                        Payé intégralement
+                    </span>
+
                     <a
                         :href="`mailto:${request.email}?subject=Votre demande de devis - ${request.name}`"
                         class="btn-secondary btn-sm"
@@ -414,6 +516,7 @@ onMounted(() => {
             v-if="paymentLinkData && showPaymentLinkModal"
             :order-id="paymentLinkData.orderId"
             :payment-url="paymentLinkData.paymentUrl"
+            :payment-type="paymentLinkData.paymentType"
             :client-name="paymentLinkData.clientName"
             :client-email="paymentLinkData.clientEmail"
             :total-amount="paymentLinkData.totalAmount"

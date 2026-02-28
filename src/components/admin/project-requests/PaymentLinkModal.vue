@@ -7,6 +7,7 @@ import BaseButton from '@/components/ui/BaseButton.vue';
 const props = defineProps<{
     orderId: string;
     paymentUrl: string;
+    paymentType?: 'deposit' | 'final';
     clientName: string;
     clientEmail: string;
     totalAmount: number;
@@ -24,8 +25,18 @@ const linkInput = ref<HTMLInputElement | null>(null);
 const linkCopied = ref(false);
 
 // Computed
+const isDeposit = computed(() => props.paymentType !== 'final');
+
 const finalAmount = computed(() => {
     return (props.totalAmount - props.depositAmount).toFixed(2);
+});
+
+const currentAmount = computed(() => {
+    return isDeposit.value ? props.depositAmount : props.totalAmount - props.depositAmount;
+});
+
+const modalTitle = computed(() => {
+    return isDeposit.value ? 'Lien de paiement - Acompte (30%)' : 'Lien de paiement - Solde (70%)';
 });
 
 // Formater le prix
@@ -65,8 +76,14 @@ function openPaymentLink() {
 
 // Envoyer email au client
 function sendEmailToClient() {
-    const subject = encodeURIComponent(`Votre devis - ${props.clientName}`);
-    const body = encodeURIComponent(`Bonjour ${props.clientName},
+    const subject = encodeURIComponent(
+        isDeposit.value
+            ? `Votre devis - ${props.clientName}`
+            : `Paiement du solde - ${props.clientName}`
+    );
+    const body = encodeURIComponent(
+        isDeposit.value
+            ? `Bonjour ${props.clientName},
 
 Suite à notre échange, voici votre devis personnalisé.
 
@@ -79,7 +96,20 @@ ${props.paymentUrl}
 Le projet démarrera dès réception de votre paiement.
 
 À très vite,
-Samy`);
+Samy`
+            : `Bonjour ${props.clientName},
+
+Le projet est terminé ! Voici le lien pour régler le solde restant.
+
+Montant total : ${formatPrice(props.totalAmount)}
+Solde à régler (70%) : ${formatPrice(props.totalAmount - props.depositAmount)}
+
+Lien de paiement sécurisé :
+${props.paymentUrl}
+
+Merci pour votre confiance,
+Samy`
+    );
 
     window.location.href = `mailto:${props.clientEmail}?subject=${subject}&body=${body}`;
 }
@@ -100,7 +130,7 @@ function closeModal() {
         <!-- Header de succès personnalisé -->
         <div class="text-center mb-6 -mt-2">
             <div class="text-6xl mb-3 animate-bounce">&#x2705;</div>
-            <h2 class="text-2xl font-bold text-success">Commande créée avec succès !</h2>
+            <h2 class="text-2xl font-bold text-success">{{ isDeposit ? 'Commande créée avec succès !' : 'Lien de solde généré !' }}</h2>
         </div>
 
         <!-- Récapitulatif commande -->
@@ -144,7 +174,7 @@ function closeModal() {
 
         <!-- Lien de paiement -->
         <div class="mb-6">
-            <h3 class="font-semibold text-primary mb-3">💳 Lien de paiement pour l'acompte</h3>
+            <h3 class="font-semibold text-primary mb-3">{{ isDeposit ? "💳 Lien de paiement pour l'acompte" : '💳 Lien de paiement pour le solde' }}</h3>
 
             <div class="p-4 bg-secondary-ghost rounded-lg border-2 border-dashed border-info">
                 <div class="flex gap-2 mb-3">
