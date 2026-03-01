@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npx vue-tsc:*)",
-      "Bash(npx vite build:*)"
+      "Bash(npx vite build:*)",
+      "Bash(xargs grep -l \"project\")"
     ]
   }
 }
