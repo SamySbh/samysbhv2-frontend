@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/solid';
+import AdminSidebar from '@/components/admin/AdminSidebar.vue';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -20,6 +22,10 @@ const aiAnalysis = ref<string | null>(null);
 const loadingAi = ref(false);
 const errorAi = ref<string | null>(null);
 let pollingInterval: ReturnType<typeof setInterval> | null = null;
+
+const isMobileMenuOpen = ref(false);
+const toggleMobileMenu = () => { isMobileMenuOpen.value = !isMobileMenuOpen.value; };
+const closeMobileMenu = () => { isMobileMenuOpen.value = false; };
 
 const formatUptime = (seconds: number): string => {
   const h = Math.floor(seconds / 3600);
@@ -92,122 +98,146 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-primary">Monitoring IoT</h1>
-      <button
-        @click="fetchMetrics"
-        :disabled="loadingMetrics"
-        class="px-4 py-2 bg-accent text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-50 text-sm"
-        type="button"
-      >
-        {{ loadingMetrics ? 'Chargement...' : 'Actualiser' }}
+  <div class="flex flex-col h-screen overflow-hidden">
+    <!-- Bouton de basculement du menu sur mobile -->
+    <div class="md:hidden py-4 px-6 flex justify-between items-center bg-secondary">
+      <h1 class="text-xl font-semibold text-secondary">Monitoring IoT</h1>
+      <button @click="toggleMobileMenu" class="text-secondary p-2 rounded hover:bg-secondary-ghost">
+        <Bars3Icon v-if="!isMobileMenuOpen" class="w-6 h-6" />
+        <XMarkIcon v-else class="w-6 h-6" />
       </button>
     </div>
 
-    <div v-if="errorMetrics" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
-      Erreur : {{ errorMetrics }}
-    </div>
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar -->
+      <AdminSidebar
+        active-section="iot"
+        :is-mobile-open="isMobileMenuOpen"
+        @change-section="() => {}"
+        @close-mobile-menu="closeMobileMenu"
+      />
 
-    <!-- Grille de métriques -->
-    <div v-if="metrics" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <!-- Uptime -->
-      <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
-        <p class="text-sm text-gray-500 mb-1">Uptime</p>
-        <p class="text-2xl font-bold text-gray-800">{{ formatUptime(metrics.uptime) }}</p>
+      <!-- Contenu principal -->
+      <div class="flex-1 overflow-auto">
+        <div class="p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-semibold text-secondary">Monitoring IoT</h1>
+            <button
+              @click="fetchMetrics"
+              :disabled="loadingMetrics"
+              class="px-4 py-2 bg-accent text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-50 text-sm"
+              type="button"
+            >
+              {{ loadingMetrics ? 'Chargement...' : 'Actualiser' }}
+            </button>
+          </div>
+
+          <div v-if="errorMetrics" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+            Erreur : {{ errorMetrics }}
+          </div>
+
+          <!-- Grille de métriques -->
+          <div v-if="metrics" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Uptime -->
+            <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
+              <p class="text-sm text-gray-500 mb-1">Uptime</p>
+              <p class="text-2xl font-bold text-gray-800">{{ formatUptime(metrics.uptime) }}</p>
+            </div>
+
+            <!-- Requêtes totales -->
+            <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+              <p class="text-sm text-gray-500 mb-1">Requêtes totales</p>
+              <p class="text-2xl font-bold text-gray-800">{{ metrics.requestCount }}</p>
+            </div>
+
+            <!-- Erreurs -->
+            <div class="bg-white rounded-lg shadow p-5 border-l-4 border-gray-400">
+              <p class="text-sm text-gray-500 mb-1">Erreurs</p>
+              <p class="text-2xl font-bold text-gray-800">{{ metrics.errorCount }}</p>
+            </div>
+
+            <!-- Taux d'erreur — rouge si > 50% -->
+            <div
+              class="rounded-lg shadow p-5 border-l-4 transition-colors"
+              :class="metrics.errorRate > 50
+                ? 'bg-red-50 border-red-500'
+                : 'bg-white border-orange-500'"
+            >
+              <p class="text-sm mb-1" :class="metrics.errorRate > 50 ? 'text-red-500' : 'text-gray-500'">
+                Taux d'erreur
+              </p>
+              <p class="text-2xl font-bold" :class="metrics.errorRate > 50 ? 'text-red-700' : 'text-gray-800'">
+                {{ metrics.errorRate }}%
+              </p>
+              <p v-if="metrics.errorRate > 50" class="text-xs text-red-500 mt-1 font-medium">⚠ Seuil critique dépassé</p>
+            </div>
+
+            <!-- Temps de réponse moyen -->
+            <div class="bg-white rounded-lg shadow p-5 border-l-4 border-purple-500">
+              <p class="text-sm text-gray-500 mb-1">Temps de réponse moyen</p>
+              <p class="text-2xl font-bold text-gray-800">{{ metrics.avgResponseTime }} ms</p>
+            </div>
+
+            <!-- Échecs d'authentification — rouge si > 5 -->
+            <div
+              class="rounded-lg shadow p-5 border-l-4 transition-colors"
+              :class="metrics.authFailures > 5
+                ? 'bg-red-50 border-red-500'
+                : 'bg-white border-yellow-500'"
+            >
+              <p class="text-sm mb-1" :class="metrics.authFailures > 5 ? 'text-red-500' : 'text-gray-500'">
+                Tentatives de connexion échouées
+              </p>
+              <p class="text-2xl font-bold" :class="metrics.authFailures > 5 ? 'text-red-700' : 'text-gray-800'">
+                {{ metrics.authFailures }}
+              </p>
+              <p v-if="metrics.authFailures > 5" class="text-xs text-red-500 mt-1 font-medium">⚠ Activité suspecte détectée</p>
+            </div>
+          </div>
+
+          <!-- Squelette de chargement -->
+          <div v-else-if="loadingMetrics" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="i in 6" :key="i" class="bg-white rounded-lg shadow p-5 animate-pulse">
+              <div class="h-3 bg-gray-200 rounded w-1/2 mb-3"></div>
+              <div class="h-7 bg-gray-200 rounded w-3/4"></div>
+            </div>
+          </div>
+
+          <!-- Section analyse IA -->
+          <div v-if="metrics" class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-gray-800">Analyse IA</h2>
+              <button
+                @click="analyzeWithAI"
+                :disabled="loadingAi"
+                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors disabled:opacity-50 text-sm flex items-center gap-2"
+                type="button"
+              >
+                <span
+                  v-if="loadingAi"
+                  class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></span>
+                {{ loadingAi ? 'Analyse en cours...' : "Analyser avec l'IA" }}
+              </button>
+            </div>
+
+            <div v-if="errorAi" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+              Erreur IA : {{ errorAi }}
+            </div>
+
+            <div
+              v-if="aiAnalysis"
+              class="bg-gray-50 rounded p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed"
+            >
+              {{ aiAnalysis }}
+            </div>
+
+            <p v-if="!aiAnalysis && !loadingAi && !errorAi" class="text-sm text-gray-400 italic">
+              Cliquez sur "Analyser avec l'IA" pour obtenir un diagnostic basé sur les métriques actuelles.
+            </p>
+          </div>
+        </div>
       </div>
-
-      <!-- Requêtes totales -->
-      <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
-        <p class="text-sm text-gray-500 mb-1">Requêtes totales</p>
-        <p class="text-2xl font-bold text-gray-800">{{ metrics.requestCount }}</p>
-      </div>
-
-      <!-- Erreurs -->
-      <div class="bg-white rounded-lg shadow p-5 border-l-4 border-gray-400">
-        <p class="text-sm text-gray-500 mb-1">Erreurs</p>
-        <p class="text-2xl font-bold text-gray-800">{{ metrics.errorCount }}</p>
-      </div>
-
-      <!-- Taux d'erreur — rouge si > 50% -->
-      <div
-        class="rounded-lg shadow p-5 border-l-4 transition-colors"
-        :class="metrics.errorRate > 50
-          ? 'bg-red-50 border-red-500'
-          : 'bg-white border-orange-500'"
-      >
-        <p class="text-sm mb-1" :class="metrics.errorRate > 50 ? 'text-red-500' : 'text-gray-500'">
-          Taux d'erreur
-        </p>
-        <p class="text-2xl font-bold" :class="metrics.errorRate > 50 ? 'text-red-700' : 'text-gray-800'">
-          {{ metrics.errorRate }}%
-        </p>
-        <p v-if="metrics.errorRate > 50" class="text-xs text-red-500 mt-1 font-medium">⚠ Seuil critique dépassé</p>
-      </div>
-
-      <!-- Temps de réponse moyen -->
-      <div class="bg-white rounded-lg shadow p-5 border-l-4 border-purple-500">
-        <p class="text-sm text-gray-500 mb-1">Temps de réponse moyen</p>
-        <p class="text-2xl font-bold text-gray-800">{{ metrics.avgResponseTime }} ms</p>
-      </div>
-
-      <!-- Échecs d'authentification — rouge si > 5 -->
-      <div
-        class="rounded-lg shadow p-5 border-l-4 transition-colors"
-        :class="metrics.authFailures > 5
-          ? 'bg-red-50 border-red-500'
-          : 'bg-white border-yellow-500'"
-      >
-        <p class="text-sm mb-1" :class="metrics.authFailures > 5 ? 'text-red-500' : 'text-gray-500'">
-          Tentatives de connexion échouées
-        </p>
-        <p class="text-2xl font-bold" :class="metrics.authFailures > 5 ? 'text-red-700' : 'text-gray-800'">
-          {{ metrics.authFailures }}
-        </p>
-        <p v-if="metrics.authFailures > 5" class="text-xs text-red-500 mt-1 font-medium">⚠ Activité suspecte détectée</p>
-      </div>
-    </div>
-
-    <!-- Squelette de chargement -->
-    <div v-else-if="loadingMetrics" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div v-for="i in 6" :key="i" class="bg-white rounded-lg shadow p-5 animate-pulse">
-        <div class="h-3 bg-gray-200 rounded w-1/2 mb-3"></div>
-        <div class="h-7 bg-gray-200 rounded w-3/4"></div>
-      </div>
-    </div>
-
-    <!-- Section analyse IA -->
-    <div v-if="metrics" class="bg-white rounded-lg shadow p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-800">Analyse IA</h2>
-        <button
-          @click="analyzeWithAI"
-          :disabled="loadingAi"
-          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors disabled:opacity-50 text-sm flex items-center gap-2"
-          type="button"
-        >
-          <span
-            v-if="loadingAi"
-            class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
-          ></span>
-          {{ loadingAi ? 'Analyse en cours...' : "Analyser avec l'IA" }}
-        </button>
-      </div>
-
-      <div v-if="errorAi" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
-        Erreur IA : {{ errorAi }}
-      </div>
-
-      <div
-        v-if="aiAnalysis"
-        class="bg-gray-50 rounded p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed"
-      >
-        {{ aiAnalysis }}
-      </div>
-
-      <p v-if="!aiAnalysis && !loadingAi && !errorAi" class="text-sm text-gray-400 italic">
-        Cliquez sur "Analyser avec l'IA" pour obtenir un diagnostic basé sur les métriques actuelles.
-      </p>
     </div>
   </div>
 </template>
