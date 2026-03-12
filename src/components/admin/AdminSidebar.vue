@@ -100,7 +100,12 @@ const goToIot = () => {
                 Demandes de projet
             </button>
 
-            <button @click="goToIot" class="w-full text-left px-4 py-3 rounded transition-colors hover:bg-secondary-ghost text-white hover:text-accent" type="button">
+            <button @click="goToIot" :class="[
+                'w-full text-left px-4 py-3 rounded transition-colors',
+                activeSection === 'iot'
+                    ? 'bg-accent text-secondary font-medium'
+                    : 'hover:bg-secondary-ghost text-white hover:text-accent'
+            ]" type="button">
                 Monitoring IoT
             </button>
         </nav>

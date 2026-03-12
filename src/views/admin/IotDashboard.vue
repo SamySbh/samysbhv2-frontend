@@ -28,7 +28,6 @@ let pollingInterval: ReturnType<typeof setInterval> | null = null;
 
 const isMobileMenuOpen = ref(false);
 const toggleMobileMenu = () => { isMobileMenuOpen.value = !isMobileMenuOpen.value; };
-const closeMobileMenu = () => { isMobileMenuOpen.value = false; };
 
 const handleChangeSection = (section: string) => {
   router.push({ path: '/admin', query: { section } });
@@ -119,9 +118,9 @@ onUnmounted(() => {
       <!-- Sidebar -->
       <AdminSidebar
         active-section="iot"
-        :is-mobile-open="isMobileMenuOpen"
+        :is-mobile-open="false"
         @change-section="handleChangeSection"
-        @close-mobile-menu="closeMobileMenu"
+        @close-mobile-menu="() => {}"
       />
 
       <!-- Contenu principal -->
