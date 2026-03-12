@@ -64,6 +64,12 @@ const routes = [
     meta: { requiresAdmin: true, requiresAuth: true, title: 'Administration' }
   },
   {
+    path: '/admin/iot',
+    name: 'IotDashboard',
+    component: () => import('@/views/admin/IotDashboard.vue'),
+    meta: { requiresAdmin: true, requiresAuth: true, title: 'Monitoring IoT' }
+  },
+  {
     path: '/checkout',
     name: 'checkout',
     component: () => import('@/views/Checkout.vue'),

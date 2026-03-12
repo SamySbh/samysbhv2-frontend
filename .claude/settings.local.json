@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npx vue-tsc:*)",
       "Bash(npx vite build:*)",
-      "Bash(xargs grep -l \"project\")"
+      "Bash(xargs grep -l \"project\")",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)"
     ]
   }
 }

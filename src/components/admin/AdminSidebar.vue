@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 // Définition des props et emits
 defineProps({
     activeSection: {
@@ -22,6 +26,11 @@ const emit = defineEmits([
 const setActiveSection = (section: 'users' | 'orders' | 'ordersAdmin' | 'orderItems' | 'services' | 'projectRequests') => {
     emit('changeSection', section);
     // Fermer le menu automatiquement sur mobile
+    emit('closeMobileMenu');
+};
+
+const goToIot = () => {
+    router.push('/admin/iot');
     emit('closeMobileMenu');
 };
 </script>
@@ -89,6 +98,10 @@ const setActiveSection = (section: 'users' | 'orders' | 'ordersAdmin' | 'orderIt
                     : 'hover:bg-secondary-ghost text-white hover:text-accent'
             ]" type="button">
                 Demandes de projet
+            </button>
+
+            <button @click="goToIot" class="w-full text-left px-4 py-3 rounded transition-colors hover:bg-secondary-ghost text-white hover:text-accent" type="button">
+                Monitoring IoT
             </button>
         </nav>
     </aside>
