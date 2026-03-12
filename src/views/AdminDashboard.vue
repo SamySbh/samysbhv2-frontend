@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/solid'; // Importez ces icônes
 import AdminSidebar from '@/components/admin/AdminSidebar.vue';
 import UserList from '@/components/admin/users/UserList.vue';
@@ -22,6 +23,8 @@ const closeMobileMenu = () => {
     isMobileMenuOpen.value = false;
 };
 
+const route = useRoute();
+
 // La section active du dashboard
 const activeSection = ref<'users' | 'orders' | 'ordersAdmin' | 'orderItems' | 'services' | 'projectRequests'>('users');
 
@@ -30,6 +33,14 @@ const changeSection = (section: typeof activeSection.value) => {
     activeSection.value = section;
     // La fermeture du menu est maintenant gérée dans le composant AdminSidebar
 };
+
+onMounted(() => {
+    const section = route.query.section as string | undefined;
+    const valid = ['users', 'orders', 'ordersAdmin', 'orderItems', 'services', 'projectRequests'];
+    if (section && valid.includes(section)) {
+        activeSection.value = section as typeof activeSection.value;
+    }
+});
 </script>
 
 <template>

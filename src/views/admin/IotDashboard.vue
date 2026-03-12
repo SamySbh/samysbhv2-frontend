@@ -30,6 +30,10 @@ const isMobileMenuOpen = ref(false);
 const toggleMobileMenu = () => { isMobileMenuOpen.value = !isMobileMenuOpen.value; };
 const closeMobileMenu = () => { isMobileMenuOpen.value = false; };
 
+const handleChangeSection = (section: string) => {
+  router.push({ path: '/admin', query: { section } });
+};
+
 const formatUptime = (seconds: number): string => {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -116,7 +120,7 @@ onUnmounted(() => {
       <AdminSidebar
         active-section="iot"
         :is-mobile-open="isMobileMenuOpen"
-        @change-section="() => router.push('/admin')"
+        @change-section="handleChangeSection"
         @close-mobile-menu="closeMobileMenu"
       />
 
