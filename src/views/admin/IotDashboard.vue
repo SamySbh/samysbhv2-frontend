@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/solid';
 import AdminSidebar from '@/components/admin/AdminSidebar.vue';
+
+const router = useRouter();
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -113,7 +116,7 @@ onUnmounted(() => {
       <AdminSidebar
         active-section="iot"
         :is-mobile-open="isMobileMenuOpen"
-        @change-section="() => {}"
+        @change-section="() => router.push('/admin')"
         @close-mobile-menu="closeMobileMenu"
       />
 
