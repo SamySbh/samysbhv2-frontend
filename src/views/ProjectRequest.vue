@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cart.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { projectRequestApi } from '@/services/api/projectRequest.api';
+import { projectRequestApi } from '@/services/api/projectrequest.api';
 import type { CreateProjectRequestDto } from '@/types/projectRequest';
 import BaseInput from '@/components/ui/BaseInput.vue';
 import BaseSelect from '@/components/ui/BaseSelect.vue';

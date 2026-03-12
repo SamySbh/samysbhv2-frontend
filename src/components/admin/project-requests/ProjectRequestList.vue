@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { projectRequestApi } from '@/services/api/projectRequest.api';
+import { projectRequestApi } from '@/services/api/projectrequest.api';
 import { useOrderStore } from '@/stores/order.store';
 import type { ProjectRequest } from '@/types/projectRequest';
 import BaseButton from '@/components/ui/BaseButton.vue';

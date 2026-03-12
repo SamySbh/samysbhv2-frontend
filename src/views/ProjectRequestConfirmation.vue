@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { projectRequestApi } from '@/services/api/projectRequest.api';
+import { projectRequestApi } from '@/services/api/projectrequest.api';
 import type { ProjectRequest } from '@/types/projectRequest';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseAlert from '@/components/ui/BaseAlert.vue';
