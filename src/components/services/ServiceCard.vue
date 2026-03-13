@@ -38,7 +38,7 @@ const getImageUrl = computed(() => {
     <div class="card hover:shadow-lg transition-shadow space-y-4 flex flex-col justify-between">
         <div class="text-center flex items-center flex-col space-y-2">
             <h2 class="text-2xl font-bold">{{ service.name }}</h2>
-            <img class="text-center w-3/5" :src="getImageUrl" :alt="service.name">
+            <img class="text-center w-3/5" :src="getImageUrl" :alt="service.name" loading="lazy">
             <p class="text-3xl font-bold text-accent">
                 {{ service.basePrice }}€ HT
             </p>

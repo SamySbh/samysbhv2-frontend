@@ -77,7 +77,7 @@ const portfolio = ref<Project[]>([
             <div class="grid lg:grid-cols-3 gap-8">
                 <div v-for="project in portfolio" :key="project.title"
                     class="group  relative overflow-hidden rounded">
-                    <img :src="project.image" :alt="project.title" class="w-full h-64 object-cover">
+                    <img :src="project.image" :alt="project.title" class="w-full h-64 object-cover" loading="lazy">
                     <div
                         class="absolute inset-0 bg-gradient-to-t from-secondary via-secondary-ghost to-transparent p-6 flex flex-col justify-end transform translate-y-4 group-hover:translate-y-0 transition-transform">
                         <h3 class="text-xl font-bold text-primary mb-2">{{ project.title }}</h3>
