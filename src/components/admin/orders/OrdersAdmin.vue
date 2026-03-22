@@ -31,6 +31,14 @@ const selectedOrder = ref<Order | null>(null);
 const showPaymentModal = ref(false);
 const paymentUrl = ref('');
 
+// Modal validation devis
+const validateQuoteOrder = ref<Order | null>(null);
+const showValidateQuoteModal = ref(false);
+const validateQuoteTotalAmount = ref(0);
+const validateQuoteDepositAmount = ref(0);
+const validateQuoteLoading = ref(false);
+const validateQuoteError = ref<string | null>(null);
+
 // Options de filtres
 const orderStatuses = [
     { value: '', label: 'Tous' },
@@ -43,6 +51,7 @@ const orderStatuses = [
 
 const paymentStatuses = [
     { value: '', label: 'Tous' },
+    { value: 'QUOTE_PENDING', label: 'Devis en préparation' },
     { value: 'PENDING_DEPOSIT', label: 'Attente acompte' },
     { value: 'DEPOSIT_PAID', label: 'Acompte payé' },
     { value: 'PENDING_FINAL', label: 'Attente solde' },
@@ -172,6 +181,48 @@ async function generateFinalPaymentLink(order: Order) {
 function viewClientPage(orderId: string) {
     const route = router.resolve({ name: 'order-page', params: { id: orderId } });
     window.open(route.href, '_blank', 'noopener,noreferrer');
+}
+
+// Ouvrir la modale de validation de devis
+function openValidateQuoteModal(order: Order) {
+    validateQuoteOrder.value = order;
+    validateQuoteTotalAmount.value = order.totalAmount;
+    validateQuoteDepositAmount.value = order.depositAmount;
+    validateQuoteError.value = null;
+    showValidateQuoteModal.value = true;
+}
+
+// Confirmer la validation du devis
+async function confirmValidateQuote() {
+    if (!validateQuoteOrder.value?.id) return;
+    validateQuoteLoading.value = true;
+    validateQuoteError.value = null;
+
+    try {
+        const { getAuthHeaders } = await import('@/utils/http');
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+        const response = await fetch(`${apiUrl}/orders/${validateQuoteOrder.value.id}/validate-quote`, {
+            method: 'PATCH',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                totalAmount: validateQuoteTotalAmount.value,
+                depositAmount: validateQuoteDepositAmount.value,
+            }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Erreur lors de la validation');
+        }
+
+        showValidateQuoteModal.value = false;
+        validateQuoteOrder.value = null;
+        await loadOrders();
+    } catch (err) {
+        validateQuoteError.value = err instanceof Error ? err.message : 'Erreur serveur';
+    } finally {
+        validateQuoteLoading.value = false;
+    }
 }
 
 // Fermer la modal de paiement et rafraîchir
@@ -349,6 +400,17 @@ onMounted(() => {
 
                 <!-- Actions -->
                 <div class="flex flex-wrap gap-2 mt-6 pt-4 border-t border-primary-ghost/20">
+                    <!-- Valider le devis -->
+                    <BaseButton
+                        v-if="order.statusPayment === 'QUOTE_PENDING'"
+                        variant="accent"
+                        size="sm"
+                        @click="openValidateQuoteModal(order)"
+                        :disabled="actionLoading === order.id"
+                    >
+                        Valider le devis
+                    </BaseButton>
+
                     <!-- Marquer comme livré -->
                     <BaseButton
                         v-if="canMarkAsCompleted(order)"
@@ -388,6 +450,61 @@ onMounted(() => {
                     >
                         Contacter
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale validation devis -->
+        <div
+            v-if="showValidateQuoteModal"
+            class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            @click.self="showValidateQuoteModal = false"
+        >
+            <div class="bg-secondary rounded-lg shadow-xl p-6 w-full max-w-md">
+                <h3 class="text-lg font-semibold text-primary mb-4">Valider le devis</h3>
+                <p class="text-sm text-primary-ghost mb-6">
+                    Commande #{{ validateQuoteOrder?.id?.slice(-8).toUpperCase() }}<br>
+                    Ajustez les montants si nécessaire puis confirmez.
+                </p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-primary mb-1">Montant total (EUR)</label>
+                        <input
+                            v-model.number="validateQuoteTotalAmount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            class="w-full border border-primary-ghost/30 rounded-md px-3 py-2 bg-secondary text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-primary mb-1">Montant de l'acompte (EUR)</label>
+                        <input
+                            v-model.number="validateQuoteDepositAmount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            class="w-full border border-primary-ghost/30 rounded-md px-3 py-2 bg-secondary text-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                        />
+                    </div>
+                </div>
+
+                <p v-if="validateQuoteError" class="mt-3 text-sm text-error">{{ validateQuoteError }}</p>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <BaseButton variant="secondary" size="sm" @click="showValidateQuoteModal = false">
+                        Annuler
+                    </BaseButton>
+                    <BaseButton
+                        variant="accent"
+                        size="sm"
+                        :loading="validateQuoteLoading"
+                        @click="confirmValidateQuote"
+                    >
+                        <template #loading>Validation...</template>
+                        Confirmer
+                    </BaseButton>
                 </div>
             </div>
         </div>

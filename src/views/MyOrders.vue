@@ -66,6 +66,7 @@ function getProgressPercent(order: Order): number {
 }
 
 function getProgressText(order: Order): string {
+    if (order.statusPayment === 'QUOTE_PENDING') return 'Devis en cours de préparation';
     if (order.statusPayment === 'FULLY_PAID') return 'Projet termine et paye';
     if (order.statusMain === 'COMPLETED') return 'Projet livre - En attente paiement final';
     if (order.statusMain === 'IN_PROGRESS') return 'Developpement en cours';

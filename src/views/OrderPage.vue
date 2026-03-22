@@ -371,10 +371,20 @@ onMounted(() => {
 
             <!-- Actions de paiement -->
             <section
-                v-if="canPayDeposit || canPayFinal"
+                v-if="canPayDeposit || canPayFinal || order.statusPayment === 'QUOTE_PENDING'"
                 class="bg-secondary-ghost rounded-lg shadow-md p-6 mb-6 border-2 border-accent"
             >
                 <h2 class="text-lg font-semibold text-primary mb-4">Paiement</h2>
+
+                <!-- Devis en cours de préparation -->
+                <div v-if="order.statusPayment === 'QUOTE_PENDING'" class="text-center">
+                    <p class="text-primary mb-2">
+                        Votre demande a bien été reçue. Votre devis est en cours de préparation.
+                    </p>
+                    <p class="text-sm text-primary-ghost">
+                        Vous recevrez un email dès qu'il sera prêt pour règlement.
+                    </p>
+                </div>
 
                 <!-- Payer l'acompte -->
                 <div v-if="canPayDeposit" class="text-center">

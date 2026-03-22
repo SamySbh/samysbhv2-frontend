@@ -2,7 +2,7 @@ import { Order } from '../types/order';
 
 // Types pour les statuts
 export type OrderMainStatus = 'NEW' | 'VALIDATED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED';
-export type OrderPaymentStatus = 'PENDING_DEPOSIT' | 'DEPOSIT_PAID' | 'PENDING_FINAL' | 'FULLY_PAID';
+export type OrderPaymentStatus = 'QUOTE_PENDING' | 'PENDING_DEPOSIT' | 'DEPOSIT_PAID' | 'PENDING_FINAL' | 'FULLY_PAID';
 export type BadgeVariant = 'info' | 'emphasis' | 'warning' | 'success' | 'error';
 
 // Libellés pour les statuts principaux
@@ -16,6 +16,7 @@ export const mainStatusLabels: Record<OrderMainStatus, string> = {
 
 // Libellés pour les statuts de paiement
 export const paymentStatusLabels: Record<OrderPaymentStatus, string> = {
+    'QUOTE_PENDING': 'Devis en préparation',
     'PENDING_DEPOSIT': 'En attente d\'acompte',
     'DEPOSIT_PAID': 'Acompte payé',
     'PENDING_FINAL': 'En attente de paiement final',
@@ -47,6 +48,7 @@ export const getMainStatusVariant = (status: OrderMainStatus): BadgeVariant => {
 // Obtenir la variante de badge pour le statut de paiement
 export const getPaymentStatusVariant = (status: OrderPaymentStatus): BadgeVariant => {
     const variants: Record<OrderPaymentStatus, BadgeVariant> = {
+        'QUOTE_PENDING': 'info',
         'PENDING_DEPOSIT': 'error',
         'DEPOSIT_PAID': 'warning',
         'PENDING_FINAL': 'info',
@@ -72,6 +74,7 @@ export const getMainStatusClasses = (status: OrderMainStatus) => {
 export const getPaymentStatusClasses = (status: OrderPaymentStatus) => {
     const baseClasses = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
     const variantClasses: Record<OrderPaymentStatus, string> = {
+        'QUOTE_PENDING': 'bg-info-light text-info',
         'PENDING_DEPOSIT': 'bg-error-light text-error',
         'DEPOSIT_PAID': 'bg-warning-light text-warning',
         'PENDING_FINAL': 'bg-info-light text-info',
