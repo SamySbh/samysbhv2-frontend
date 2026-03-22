@@ -25,7 +25,7 @@ export interface Order {
 }
 
 export type OrderStatus = 'NEW' | 'VALIDATED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED';
-export type PaymentStatus = 'PENDING_DEPOSIT' | 'DEPOSIT_PAID' | 'PENDING_FINAL' | 'FULLY_PAID';
+export type PaymentStatus = 'QUOTE_PENDING' | 'PENDING_DEPOSIT' | 'DEPOSIT_PAID' | 'PENDING_FINAL' | 'FULLY_PAID';
 
 export interface CreateOrderDto {
     projectRequestId: string;
