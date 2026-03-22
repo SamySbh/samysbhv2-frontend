@@ -24,6 +24,8 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const filterOrderStatus = ref<string>('');
 const filterPaymentStatus = ref<string>('');
+const sortField = ref<'createdAt' | 'totalAmount'>('createdAt');
+const sortDirection = ref<'asc' | 'desc'>('desc');
 const actionLoading = ref<string | null>(null);
 
 // Modal lien de paiement
@@ -58,7 +60,7 @@ const paymentStatuses = [
     { value: 'FULLY_PAID', label: 'Payé intégralement' },
 ];
 
-// Commandes filtrées
+// Commandes filtrées et triées
 const filteredOrders = computed(() => {
     let result = orders.value;
 
@@ -68,6 +70,18 @@ const filteredOrders = computed(() => {
     if (filterPaymentStatus.value) {
         result = result.filter(o => o.statusPayment === filterPaymentStatus.value);
     }
+
+    result = [...result].sort((a, b) => {
+        let valA: number, valB: number;
+        if (sortField.value === 'totalAmount') {
+            valA = a.totalAmount;
+            valB = b.totalAmount;
+        } else {
+            valA = new Date(a.createdAt ?? 0).getTime();
+            valB = new Date(b.createdAt ?? 0).getTime();
+        }
+        return sortDirection.value === 'asc' ? valA - valB : valB - valA;
+    });
 
     return result;
 });
@@ -287,6 +301,21 @@ onMounted(() => {
                         ]"
                     >
                         {{ status.label }} ({{ countByPaymentStatus(status.value) }})
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tri -->
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">Trier par :</label>
+                <div class="flex flex-wrap gap-2">
+                    <button @click="sortField = 'createdAt'; sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'"
+                        :class="['px-4 py-2 rounded-md text-sm transition-colors', sortField === 'createdAt' ? 'bg-accent text-secondary' : 'bg-secondary-ghost hover:bg-emphasis text-primary']">
+                        Date {{ sortField === 'createdAt' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+                    </button>
+                    <button @click="sortField = 'totalAmount'; sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'"
+                        :class="['px-4 py-2 rounded-md text-sm transition-colors', sortField === 'totalAmount' ? 'bg-accent text-secondary' : 'bg-secondary-ghost hover:bg-emphasis text-primary']">
+                        Montant {{ sortField === 'totalAmount' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
                     </button>
                 </div>
             </div>

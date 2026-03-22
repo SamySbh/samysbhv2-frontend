@@ -16,6 +16,8 @@ const requests = ref<ProjectRequest[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const filterStatus = ref<string>('');
+const sortField = ref<'createdAt' | 'estimatedTotal'>('createdAt');
+const sortDirection = ref<'asc' | 'desc'>('desc');
 const actionLoading = ref<string | null>(null);
 const selectedRequest = ref<ProjectRequest | null>(null);
 const showOrderModal = ref(false);
@@ -42,6 +44,20 @@ const statuses = [
 const filteredRequests = computed(() => {
     if (!filterStatus.value) return requests.value;
     return requests.value.filter(r => r.status === filterStatus.value);
+});
+
+const sortedRequests = computed(() => {
+    return [...filteredRequests.value].sort((a, b) => {
+        let valA: number, valB: number;
+        if (sortField.value === 'estimatedTotal') {
+            valA = a.estimatedTotal;
+            valB = b.estimatedTotal;
+        } else {
+            valA = new Date(a.createdAt ?? 0).getTime();
+            valB = new Date(b.createdAt ?? 0).getTime();
+        }
+        return sortDirection.value === 'asc' ? valA - valB : valB - valA;
+    });
 });
 
 function countByStatus(status: string): number {
@@ -283,21 +299,42 @@ onMounted(() => {
             </BaseButton>
         </div>
 
-        <!-- Filtres par statut -->
-        <div class="flex flex-wrap gap-2 mb-6">
-            <button
-                v-for="status in statuses"
-                :key="status.value"
-                @click="filterStatus = status.value"
-                :class="[
-                    'px-4 py-2 rounded-md transition-colors text-sm',
-                    filterStatus === status.value
-                        ? 'bg-accent text-secondary'
-                        : 'bg-secondary-ghost hover:bg-emphasis text-primary'
-                ]"
-            >
-                {{ status.label }} ({{ countByStatus(status.value) }})
-            </button>
+        <!-- Filtres et tri -->
+        <div class="card-admin p-4 mb-6 space-y-4">
+            <!-- Filtres par statut -->
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">Statut :</label>
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        v-for="status in statuses"
+                        :key="status.value"
+                        @click="filterStatus = status.value"
+                        :class="[
+                            'px-4 py-2 rounded-md transition-colors text-sm',
+                            filterStatus === status.value
+                                ? 'bg-accent text-secondary'
+                                : 'bg-secondary-ghost hover:bg-emphasis text-primary'
+                        ]"
+                    >
+                        {{ status.label }} ({{ countByStatus(status.value) }})
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tri -->
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">Trier par :</label>
+                <div class="flex flex-wrap gap-2">
+                    <button @click="sortField = 'createdAt'; sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'"
+                        :class="['px-4 py-2 rounded-md text-sm transition-colors', sortField === 'createdAt' ? 'bg-accent text-secondary' : 'bg-secondary-ghost hover:bg-emphasis text-primary']">
+                        Date {{ sortField === 'createdAt' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+                    </button>
+                    <button @click="sortField = 'estimatedTotal'; sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'"
+                        :class="['px-4 py-2 rounded-md text-sm transition-colors', sortField === 'estimatedTotal' ? 'bg-accent text-secondary' : 'bg-secondary-ghost hover:bg-emphasis text-primary']">
+                        Montant {{ sortField === 'estimatedTotal' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- État de chargement -->
@@ -319,14 +356,14 @@ onMounted(() => {
         </div>
 
         <!-- Liste vide -->
-        <div v-else-if="filteredRequests.length === 0" class="text-center py-8 text-primary-ghost bg-secondary-ghost rounded-lg">
+        <div v-else-if="sortedRequests.length === 0" class="text-center py-8 text-primary-ghost bg-secondary-ghost rounded-lg">
             Aucune demande {{ filterStatus ? `avec le statut "${getStatusLabel(filterStatus)}"` : '' }}
         </div>
 
         <!-- Liste des demandes -->
         <div v-else class="space-y-4">
             <div
-                v-for="request in filteredRequests"
+                v-for="request in sortedRequests"
                 :key="request.id"
                 class="card-admin p-6"
             >
