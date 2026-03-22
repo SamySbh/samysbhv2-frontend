@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useOrderStore } from '@/stores/order.store';
 import { useUserStore } from '@/stores/user.store';
 import { storeToRefs } from 'pinia';
-import { Order } from '@/types/order';
+import { Order, PaymentStatus } from '@/types/order';
 import BaseModal from '@/components/ui/BaseModal.vue';
 import BaseInput from '@/components/ui/BaseInput.vue';
 import BaseSelect from '@/components/ui/BaseSelect.vue';
@@ -37,7 +37,7 @@ const formatDateForInput = (date?: Date | string): string => {
 // État local du formulaire
 const formData = ref({
     statusMain: '' as 'NEW' | 'VALIDATED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED',
-    statusPayment: '' as 'PENDING_DEPOSIT' | 'DEPOSIT_PAID' | 'PENDING_FINAL' | 'FULLY_PAID',
+    statusPayment: '' as PaymentStatus,
     totalAmount: 0,
     depositAmount: 0,
     deadlineDate: '',
@@ -65,6 +65,7 @@ const mainStatusOptions = [
 ];
 
 const paymentStatusOptions = [
+    { value: 'QUOTE_PENDING', label: 'Devis en préparation' },
     { value: 'PENDING_DEPOSIT', label: 'En attente d\'acompte' },
     { value: 'DEPOSIT_PAID', label: 'Acompte payé' },
     { value: 'PENDING_FINAL', label: 'En attente du solde' },
