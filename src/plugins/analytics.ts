@@ -31,14 +31,18 @@ export default {
 
         // Consent Mode v2
         ;(window as any).dataLayer = (window as any).dataLayer || []
-        const gtagPush = (...args: unknown[]) => { ((window as any).dataLayer as unknown[]).push(args) }
+        const gtagPush = (...args: unknown[]) => {
+            ((window as any).dataLayer as unknown[]).push(args)
+        }
 
-        if (!hasConsent) {
-            gtagPush('consent', 'default', {
-                analytics_storage: 'denied',
-                ad_storage: 'denied'
-            })
-        } else {
+        // Toujours déclarer 'denied' en default en premier
+        gtagPush('consent', 'default', {
+            analytics_storage: 'denied',
+            ad_storage: 'denied'
+        })
+
+        // Ensuite mettre à jour si l'utilisateur a déjà consenti
+        if (hasConsent) {
             gtagPush('consent', 'update', {
                 analytics_storage: 'granted',
                 ad_storage: 'granted'
