@@ -30,18 +30,19 @@ export default {
         }
 
         // Consent Mode v2
-        if (typeof window.gtag === 'function') {
-            if (!hasConsent) {
-                window.gtag('consent', 'default', {
-                    'analytics_storage': 'denied',
-                    'ad_storage': 'denied'
-                })
-            } else {
-                window.gtag('consent', 'update', {
-                    'analytics_storage': 'granted',
-                    'ad_storage': 'granted'
-                })
-            }
+        ;(window as any).dataLayer = (window as any).dataLayer || []
+        const gtagPush = (...args: unknown[]) => { ((window as any).dataLayer as unknown[]).push(args) }
+
+        if (!hasConsent) {
+            gtagPush('consent', 'default', {
+                analytics_storage: 'denied',
+                ad_storage: 'denied'
+            })
+        } else {
+            gtagPush('consent', 'update', {
+                analytics_storage: 'granted',
+                ad_storage: 'granted'
+            })
         }
 
         app.use(VueGtag, config, options.router)
