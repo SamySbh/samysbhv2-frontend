@@ -2,6 +2,9 @@
 import { RouterLink } from 'vue-router'
 import gitHub from '@/assets/logos/icons8-github-sticker.svg'
 import linkedIn from '@/assets/logos/icons8-linkedin-sticker.svg'
+import useCookieConsent from '@/composables/useCookieConsent'
+
+const { resetConsent } = useCookieConsent()
 
 // Année courante pour le copyright
 const currentYear = new Date().getFullYear()
@@ -87,6 +90,7 @@ const socialLinks = [
                     <RouterLink v-for="link in legalLinks" :key="link.path" :to="link.path" class="hover:text-primary">
                         {{ link.name }}
                     </RouterLink>
+                    <button @click="resetConsent" class="hover:text-primary">Gérer mes cookies</button>
                 </div>
             </div>
         </div>

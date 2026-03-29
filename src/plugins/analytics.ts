@@ -29,6 +29,21 @@ export default {
             bootstrap: hasConsent
         }
 
+        // Consent Mode v2
+        if (typeof window.gtag === 'function') {
+            if (!hasConsent) {
+                window.gtag('consent', 'default', {
+                    'analytics_storage': 'denied',
+                    'ad_storage': 'denied'
+                })
+            } else {
+                window.gtag('consent', 'update', {
+                    'analytics_storage': 'granted',
+                    'ad_storage': 'granted'
+                })
+            }
+        }
+
         app.use(VueGtag, config, options.router)
 
         // Écouter les changements de consentement
@@ -43,10 +58,7 @@ export default {
                     })
                 }
 
-                // Si le consentement était refusé, recharger la page
-                if (localStorage.getItem('cookie_consent') !== 'accepted') {
-                    window.location.reload()
-                }
+                window.location.reload()
             } else {
                 // Désactiver Analytics
                 if (typeof window.gtag === 'function') {

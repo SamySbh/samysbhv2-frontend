@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useCookieConsent from '@/composables/useCookieConsent'
-const { needsConsent, acceptCookies, rejectCookies } = useCookieConsent()
+const { needsConsent, acceptCookies, rejectCookies, consentValue } = useCookieConsent()
 </script>
 
 <template>
@@ -15,6 +15,7 @@ const { needsConsent, acceptCookies, rejectCookies } = useCookieConsent()
                     <p class="text-sm text-secondary-ghost">
                         Ce site utilise des cookies pour améliorer votre expérience et analyser le trafic.
                         Vous pouvez accepter tous les cookies ou les refuser en cliquant sur les boutons ci-dessous.
+                        <RouterLink to="/politique-confidentialite" class="underline hover:text-secondary">En savoir plus</RouterLink>
                     </p>
                 </div>
                 <div class="flex items-center gap-3 self-end md:self-center">
@@ -29,5 +30,10 @@ const { needsConsent, acceptCookies, rejectCookies } = useCookieConsent()
                 </div>
             </div>
         </div>
+    <div v-if="!needsConsent && consentValue === 'accepted'" class="text-center py-2">
+        <button @click="rejectCookies" class="text-xs text-secondary-ghost hover:text-secondary underline">
+            Révoquer mon consentement aux cookies
+        </button>
+    </div>
     </div>
 </template>
