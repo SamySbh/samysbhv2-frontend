@@ -8,21 +8,17 @@ interface AnalyticsOptions {
     appName?: string;
 }
 
-
 export default {
     install(app: App, options: AnalyticsOptions = {}) {
         const GA_ID = options.id || import.meta.env.VITE_GA_ID || '';
 
-        // Vérifier le consentement
         const hasConsent = localStorage.getItem('cookie_consent') === 'accepted'
 
-        // Configuration
         const config = {
             config: {
                 id: GA_ID,
                 params: {
-                    anonymize_ip: true,
-                    debug_mode: true
+                    anonymize_ip: true
                 }
             },
             appName: options.appName || 'Mon Site',
@@ -30,7 +26,6 @@ export default {
             bootstrap: hasConsent
         }
 
-            // Consent Mode v2
             ; (window as any).dataLayer = (window as any).dataLayer || []
         if (!(window as any).gtag) {
             (window as any).gtag = function () {
@@ -53,21 +48,21 @@ export default {
 
         app.use(VueGtag, config, options.router)
 
-        // Écouter les changements de consentement
+        if (hasConsent && typeof (window as any).gtag === 'function') {
+            (window as any).gtag('config', GA_ID, { debug_mode: true })
+        }
+
         window.addEventListener('cookie-consent-changed', (event) => {
             const detail = (event as CustomEvent).detail
 
             if (detail?.accepted) {
-                // Activer Analytics
                 if (typeof window.gtag === 'function') {
                     window.gtag('consent', 'update', {
                         'analytics_storage': 'granted'
                     })
                 }
-
                 window.location.reload()
             } else {
-                // Désactiver Analytics
                 if (typeof window.gtag === 'function') {
                     window.gtag('consent', 'update', {
                         'analytics_storage': 'denied'
