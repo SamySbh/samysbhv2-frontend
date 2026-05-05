@@ -21,7 +21,8 @@ export default {
             config: {
                 id: GA_ID,
                 params: {
-                    anonymize_ip: true
+                    anonymize_ip: true,
+                    debug_mode: true
                 }
             },
             appName: options.appName || 'Mon Site',
@@ -29,8 +30,8 @@ export default {
             bootstrap: hasConsent
         }
 
-        // Consent Mode v2
-        ;(window as any).dataLayer = (window as any).dataLayer || []
+            // Consent Mode v2
+            ; (window as any).dataLayer = (window as any).dataLayer || []
         if (!(window as any).gtag) {
             (window as any).gtag = function () {
                 ((window as any).dataLayer as unknown[]).push(arguments)
