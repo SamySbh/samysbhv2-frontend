@@ -8,7 +8,7 @@ export const paymentApi = {
    */
   async createDepositSession(orderId: string) {
     try {
-      const response = await fetch(`${apiUrl}/payment/orders/${orderId}/deposit-payment`, {
+      const response = await fetch(`${apiUrl}/payments/orders/${orderId}/deposit-payment`, {
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -35,7 +35,7 @@ export const paymentApi = {
    */
   async createFinalSession(orderId: string) {
     try {
-      const response = await fetch(`${apiUrl}/payment/orders/${orderId}/final-payment`, {
+      const response = await fetch(`${apiUrl}/payments/orders/${orderId}/final-payment`, {
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -62,7 +62,7 @@ export const paymentApi = {
    */
   async createCheckoutSession(orderId: string) {
     try {
-      const response = await fetch(`${apiUrl}/payment/create-checkout-session`, {
+      const response = await fetch(`${apiUrl}/payments/create-checkout-session`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ orderId })

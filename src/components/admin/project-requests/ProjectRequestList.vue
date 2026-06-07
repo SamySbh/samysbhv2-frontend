@@ -505,7 +505,7 @@ onMounted(() => {
 
                     <BaseButton
                         v-if="request.orderId"
-                        variant="primary"
+                        variant="accent"
                         size="sm"
                         :disabled="actionLoading === request.id"
                         @click="generateDepositLink(request)"
