@@ -78,6 +78,13 @@ onMounted(() => {
                 :error="passwordError"
             />
 
+            <!-- Lien mot de passe oublié -->
+            <div class="text-right text-sm">
+                <router-link to="/forgot-password" class="font-medium text-accent hover:text-emphasis transition-colors">
+                    Mot de passe oublié ?
+                </router-link>
+            </div>
+
             <!-- Bouton de connexion -->
             <div>
                 <BaseButton type="submit" variant="primary" full-width :loading="loading">

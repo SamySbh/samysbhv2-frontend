@@ -52,6 +52,24 @@ const routes = [
     meta: { title: 'Inscription' }
   },
   {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/views/ForgotPassword.vue'),
+    meta: { title: 'Mot de passe oublié' }
+  },
+  {
+    path: '/reset-password',
+    name: 'reset-password',
+    component: () => import('@/views/ResetPassword.vue'),
+    meta: { title: 'Réinitialisation du mot de passe' }
+  },
+  {
+    path: '/email-verification',
+    name: 'email-verification',
+    component: () => import('@/views/EmailVerification.vue'),
+    meta: { title: 'Vérification de votre email' }
+  },
+  {
     path: '/user',
     name: 'UserDashboard',
     component: () => import('@/views/UserDashboard.vue'),
